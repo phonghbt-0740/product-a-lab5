@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+"""Quy SWP ra giờ, gán người phụ trách giả định và xếp việc vào sprint theo năng lực.
+
+Đầu vào: kết quả SWP đã hiệu chỉnh (plans/swp/calibrated.json — payload của tkm:estimate-swp),
+backlog YAML (thứ tự epic/issue) và plans/github-state.json (mã backlog ↔ số issue).
+Đầu ra: plans/project-values.json — giá trị trường Project cho từng mã backlog:
+  Point = SWP đã chốt (cha = tổng con), Giờ ước lượng = SWP × hệ số loại việc (làm tròn 0,5 giờ; cha = tổng con),
+  Phụ trách (việc lá) và Sprint (việc lá). Trạng thái sau sprint giả lập do lệnh khác ghi.
+"""
+import glob, json, os
+from collections import defaultdict
+
+import yaml
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HOURS_PER_SWP = {"API": 2.2, "Integration": 2.2, "Bugfix": 2.2, "UI": 1.9, "DB": 1.6, "QA": 2.0,
+                 "Infra": 2.4, "Deploy": 2.4, "Migration": 2.4, "Unknown": 2.0}
+TEAM = {"BE": ["BE-A", "BE-B", "BE-C"], "FE": ["FE-A"], "QA": ["QA-A", "QA-B"], "INFRA": ["INFRA-A"], "PM": ["PM"]}
+CAPACITY = {"PM": 30}            # giờ tập trung mỗi sprint; mặc định 60 = 10 ngày × 6 giờ
+DEFAULT_CAPACITY = 60
+SPRINTS = 12
+# Thứ tự làm theo phụ thuộc giữa epic: nền tảng → danh tính → master → nghiệp vụ → báo cáo/thông báo → phi chức năng
+EPIC_ORDER = ["E01", "E02", "E04", "E03", "E05", "E06", "E07", "E08", "E09", "E10", "E12", "E11", "E13", "E14", "E15", "E16"]
+
+
+def role_of(row):
+    if "clarify" in row["labels"]:
+        return "PM"  # issue làm rõ: PM chuẩn bị câu hỏi và chốt với KH
+    return {"UI": "FE", "QA": "QA", "Infra": "INFRA", "Deploy": "INFRA"}.get(row["primaryDiscipline"], "BE")
+
+
+def main():
+    state = json.load(open(os.path.join(ROOT, "plans", "github-state.json")))["issues"]
+    payload = json.load(open(os.path.join(ROOT, "plans", "swp", "calibrated.json")))
+    by_number = {int(r["issueRef"].split("#")[1]): r for r in payload["issues"]}
+    key_of = {v["number"]: k for k, v in state.items()}
+
+    # Thứ tự backlog: epic theo EPIC_ORDER, trong epic theo thứ tự trong YAML
+    epics = {e["key"]: e for e in (yaml.safe_load(open(p)) for p in glob.glob(os.path.join(ROOT, "plans", "backlog", "E*.yaml")))}
+    ordered = []
+    for ek in EPIC_ORDER:
+        for i in epics[ek]["issues"]:
+            ordered += [s["key"] for s in (i.get("subs") or [])] or [i["key"]]
+
+    load = defaultdict(float)  # (người, sprint) → giờ đã xếp
+    values = {}
+    last_sprint = defaultdict(lambda: 1)   # theo vai trò: sprint chỉ đi tới, không lấp ngược việc sau vào sprint trước
+    built_in = defaultdict(lambda: 1)      # theo issue cha: sprint muộn nhất của phần BE/DATA/INFRA đã xếp
+    done_in = defaultdict(lambda: 1)       # theo issue cha: sprint muộn nhất của mọi phần không phải QA
+    overflow = []
+    for key in ordered:
+        row = by_number[state[key]["number"]]
+        hours = round(row["finalSWP"] * HOURS_PER_SWP[row["primaryDiscipline"]] * 2) / 2
+        role = role_of(row)
+        cap = CAPACITY.get(role, DEFAULT_CAPACITY)
+        sprint, person = None, None
+        parent = key.rsplit("-S", 1)[0]
+        earliest = last_sprint[role]
+        if role == "FE":
+            earliest = max(earliest, built_in[parent])   # FE sau khi có API cùng issue
+        if role == "QA":
+            earliest = max(earliest, done_in[parent])    # QA sau khi mọi phần khác của issue xong
+        for s in range(earliest, SPRINTS + 1):  # sprint sớm nhất còn chỗ, người nhẹ việc nhất
+            free = [(load[(p, s)], p) for p in TEAM[role] if load[(p, s)] + hours <= cap]
+            if free:
+                sprint, person = s, min(free)[1]
+                break
+        if sprint is None:  # không còn chỗ: dồn vào sprint cuối và đếm để báo rủi ro
+            sprint, person = SPRINTS, TEAM[role][0]
+            overflow.append(key)
+        load[(person, sprint)] += hours
+        last_sprint[role] = sprint
+        if role in ("BE", "INFRA"):
+            built_in[parent] = max(built_in[parent], sprint)
+        if role != "QA":
+            done_in[parent] = max(done_in[parent], sprint)
+        values[key] = {"Point": row["finalSWP"], "Giờ ước lượng": hours, "Phụ trách": person, "Sprint": f"Sprint {sprint}"}
+
+    # Cha (issue có sub, epic): Point và giờ = tổng con; không gán người/sprint
+    for ek in EPIC_ORDER:
+        epic_pt = epic_h = 0
+        for i in epics[ek]["issues"]:
+            subs = [s["key"] for s in (i.get("subs") or [])]
+            if subs:
+                pt, h = sum(values[k]["Point"] for k in subs), sum(values[k]["Giờ ước lượng"] for k in subs)
+                values[i["key"]] = {"Point": pt, "Giờ ước lượng": h}
+            epic_pt += values[i["key"]]["Point"]
+            epic_h += values[i["key"]]["Giờ ước lượng"]
+        values[ek] = {"Point": epic_pt, "Giờ ước lượng": epic_h, "Phụ trách": "PM"}
+
+    json.dump(values, open(os.path.join(ROOT, "plans", "project-values.json"), "w"), ensure_ascii=False, indent=1)
+    per_sprint = defaultdict(float)
+    for (p, s), h in load.items():
+        per_sprint[s] += h
+    print("giờ theo sprint:", {s: per_sprint[s] for s in sorted(per_sprint)})
+    print("việc bị dồn vì hết chỗ:", len(overflow), overflow[:10])
+    print("tổng SWP", sum(values[e]["Point"] for e in EPIC_ORDER), "· tổng giờ", sum(values[e]["Giờ ước lượng"] for e in EPIC_ORDER))
+
+
+if __name__ == "__main__":
+    main()

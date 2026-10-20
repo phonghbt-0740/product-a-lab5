@@ -1,0 +1,8 @@
+# Chỉ dùng cục bộ — không đưa lên repo public
+CLAUDE.md
+.claude/
+context/
+plans/
+.DS_Store
+node_modules/
+.env*
