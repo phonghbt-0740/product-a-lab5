@@ -24,6 +24,9 @@ Backlog được chia từ bản nộp LAB-4 ngày 2026-10-09 (commit `f576f42`)
 
 - Repo: https://github.com/phonghbt-0740/product-a-lab5
 - GitHub Project: https://github.com/users/phonghbt-0740/projects/1
+  - View **Backlog** (bảng, nhóm theo sprint, có Point / Giờ ước lượng / Loại / Phụ trách): https://github.com/users/phonghbt-0740/projects/1/views/1
+  - View **Board** (việc lá theo Status): https://github.com/users/phonghbt-0740/projects/1/views/2
+  - View **Sprint 1** (19 việc của sprint đã giả lập: Done 12 · In Progress 5 · Todo 2): https://github.com/users/phonghbt-0740/projects/1/views/3
 - Báo cáo SWP (HTML): [`reports/swp-estimate-report.html`](reports/swp-estimate-report.html)
 - Đã mở thử bằng cửa sổ ẩn danh: có — ngày 2026-10-20, mở repo, Project, một issue và báo cáo HTML bằng trình duyệt chưa đăng nhập GitHub (cửa sổ ẩn danh): xem được đầy đủ, không bị yêu cầu đăng nhập
 
