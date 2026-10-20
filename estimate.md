@@ -142,7 +142,7 @@ SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project
 
 **Quy tắc (người dùng chốt khi review):** epic nào có MD LAB-5 thấp hơn LAB-1 quá 30% thì nâng MD LAB-5 lên bằng **70% của LAB-1**, tức chỉ cho giảm tối đa 30%. Epic giảm ít hơn 30% hoặc cao hơn LAB-1 giữ nguyên. Không áp cho FN-14 và DOC vì hai phần này không có epic ở LAB-5 (đã loại khỏi backlog, lý do ở bảng trên).
 
-**Vì sao chặn:** mức giảm lớn đến từ giả định tái dùng prototype LAB-3. Giả định này chưa được kiểm trên kiến trúc đích (ECS + RDS + Redis thay cho Vercel + Supabase), nên không để một epic rơi quá xa mức LAB-1 đã chào.
+**Vì sao chặn:** để phòng rủi ro hiểu sai yêu cầu. Một epic giảm quá nhiều so với LAB-1 có thể là dấu hiệu LAB-5 đã hiểu thiếu hoặc hiểu sai bài toán, chứ chưa chắc là việc thật sự nhẹ hơn. Vì vậy mức giảm tối đa được giới hạn đúng bằng tỷ lệ buffer 30% đã đưa ra từ giai đoạn estimate LAB-1.
 
 | Epic | LAB-1 (MD) | LAB-5 gốc (MD) | Mức giảm | Sàn 70% (MD) | LAB-5 sau chặn (MD) | Giờ sau chặn | Giờ thêm |
 |---|---:|---:|---:|---:|---:|---:|---:|
