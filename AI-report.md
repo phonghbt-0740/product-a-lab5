@@ -40,6 +40,7 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 | 6 | Hệ số giờ | Duyệt bảng 6 hệ số trước khi áp cho 316 việc lá |
 | 7 | Ghi hàng loạt | Xem 5 dòng đầu của lần chạy thử trước khi cho `--apply` |
 | 8 | Quyền | Cấp scope `project`, chỉ nhắm tài khoản cá nhân, nhắc gỡ sau LAB-5 |
+| 9 | Chặn mức giảm so với LAB-1 | Epic nào có công số LAB-5 giảm quá 30% so với LAB-1 thì nâng lên đúng 70% LAB-1 (4 epic: #85, #116, #182, #303; tổng 406,7 → 453,5 MD), để phòng rủi ro hiểu sai yêu cầu; 30% là mức buffer đã đưa ra từ đầu. Chỉ chặn trong `estimate.md`, giờ từng issue và kế hoạch sprint giữ nguyên |
 
 **Vấn đề gặp ở kết quả AI/công cụ:**
 
