@@ -135,3 +135,20 @@ SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project
 - LAB-1 nhét QA chạy test thủ công (134 MD) vào bảng task; LAB-5 chỉ còn E2E, hồi quy tự động và sub-issue [QA] (594 giờ, khoảng 74 MD).
 
 **Phần cao hơn chủ yếu vì:** LAB-5 làm đủ 53 màn trong khi LAB-1 chỉ estimate 40/53 màn; việc chuyển nền tảng Supabase sang AWS (S09, S10, D05, GĐ01, GĐ03, GĐ08), 30 issue làm rõ (79 SWP), và các màn thiết kế mới/một phần mà LAB-1 không tính hoặc tính mỏng (tranh chấp, thông báo, audit, điều chỉnh: S01, S19, S24, D01–D03).
+
+### Effort theo vai trò, trước và sau buffer 30%
+
+Buffer 30% là tỷ lệ đã chốt ở bảng task LAB-1. Buffer chỉ cộng ở cấp tổng hợp để so với LAB-1: trường "Giờ ước lượng" trên từng issue và kế hoạch 12 sprint vẫn dùng giờ **chưa buffer** (quyết định giữ nguyên kế hoạch, không kéo dài thêm sprint). Vai trò lấy theo trường "Phụ trách" của việc lá; BE gồm cả việc DATA/migration.
+
+| Vai trò | Việc lá | SWP | Giờ chưa buffer | Giờ sau buffer 30% | MD sau buffer (8h) | Tỷ lệ |
+|---|---:|---:|---:|---:|---:|---:|
+| BE | 145 | 792 | 1636,0 | 2126,8 | 265,9 | 50,3% |
+| QA | 50 | 297 | 594,0 | 772,2 | 96,5 | 18,3% |
+| FE | 69 | 296 | 556,5 | 723,5 | 90,4 | 17,1% |
+| INFRA | 22 | 126 | 302,5 | 393,3 | 49,2 | 9,3% |
+| PM (issue làm rõ) | 30 | 79 | 164,5 | 213,9 | 26,7 | 5,1% |
+| **Tổng** | **316** | **1590** | **3253,5** | **4229,6** | **528,7** | 100% |
+
+- BE + FE + QA sau buffer: 3622,5 giờ ≈ 452,8 MD.
+- Cùng buffer 30%, phần so được của LAB-1 là 501 × 1,3 = 651,3 MD, LAB-5 là 528,7 MD (thấp hơn khoảng 123 MD, cùng lý do ở trên).
+- Vẫn chưa gồm BrSE và PSM (LAB-1: 290 + 87 MD sau buffer).
