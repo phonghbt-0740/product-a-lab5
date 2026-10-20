@@ -104,6 +104,7 @@ SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project
 - **LAB-1:** MD của bảng task **trước buffer 30%**: 627 MD (gồm FN-14 51 MD, DOC 75 MD, Design UI/UX 56 MD, QA chạy test 134 MD). Sau buffer, đội 968 + BrSE 290 + PSM 87 = **1345 MD** (kịch bản AI 20% + responsive 15%).
 - **LAB-5:** MD = giờ / 8 (8 giờ một ngày công), chưa buffer, chưa BrSE/PSM: 3253,5 / 8 = **406,7 MD**.
 - Nên so 627 với 406,7. Con số 1345 MD là sau buffer và gánh BrSE/PSM mà LAB-5 chưa cộng.
+- **LAB-5 sau chặn mức giảm 30% theo epic:** **453,5 MD** (3628,1 giờ). Đây là con số estimate chốt; cách tính ở mục "Chặn mức giảm tối đa 30% theo epic" bên dưới. Bảng so sánh ngay sau đây giữ số gốc (SWP × hệ số) để thấy lệch thật trước khi chặn.
 
 | Phần (chức năng/epic) | LAB-1 (MD) | LAB-5 (MD) | Chênh | Vì sao |
 |---|---:|---:|---:|---|
@@ -126,6 +127,7 @@ SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project
 | DOC thiết kế + tài liệu bàn giao (không có) | 75 | 0,0 | -75,0 | Loại khỏi backlog: thiết kế đã làm ở LAB-4; bản thật chỉ cập nhật tài liệu API trong DoD chung. Xem dòng "Tài liệu thiết kế (LAB-4) và tài liệu bàn giao" ở `task-breakdown.md` §2 |
 | **Cộng so được (bỏ FN-14 và DOC)** | **501** | **406,7** | **-94,3** | Hai bên cùng chưa buffer, cùng chưa BrSE/PSM, cùng là việc phần mềm |
 | **Tổng** | **627** | **406,7** | **-220,3** | LAB-5 = 3253,5 giờ / 8 |
+| **Cộng so được, sau chặn 30%** | **501** | **453,5** | **-47,5** | Bốn epic giảm quá 30% được nâng lên đúng 70% LAB-1 (xem mục dưới) |
 
 **Vì sao 627 MD (trước buffer) lệch xa 1345 MD (sau buffer, BrSE, PSM):** hai con số không cùng đáy. 1345 gồm đội 968 + BrSE 290 + PSM 87, tức đã cộng buffer 30% và hai vai trò quản lý/cầu nối; 627 chỉ là nhân lực làm task. Cộng thêm hạng mục LAB-5 không có (FN-14 51 + DOC 75 = 126 MD) thì phần so được của LAB-1 là 501 MD, còn LAB-5 là 406,7 MD, thấp hơn khoảng 94 MD.
 
@@ -136,19 +138,39 @@ SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project
 
 **Phần cao hơn chủ yếu vì:** LAB-5 làm đủ 53 màn trong khi LAB-1 chỉ estimate 40/53 màn; việc chuyển nền tảng Supabase sang AWS (S09, S10, D05, GĐ01, GĐ03, GĐ08), 30 issue làm rõ (79 SWP), và các màn thiết kế mới/một phần mà LAB-1 không tính hoặc tính mỏng (tranh chấp, thông báo, audit, điều chỉnh: S01, S19, S24, D01–D03).
 
-### Effort theo vai trò, trước và sau buffer 30%
+### Chặn mức giảm tối đa 30% theo epic
 
-Buffer 30% là tỷ lệ đã chốt ở bảng task LAB-1. Buffer chỉ cộng ở cấp tổng hợp để so với LAB-1: trường "Giờ ước lượng" trên từng issue và kế hoạch 12 sprint vẫn dùng giờ **chưa buffer** (quyết định giữ nguyên kế hoạch, không kéo dài thêm sprint). Vai trò lấy theo trường "Phụ trách" của việc lá; BE gồm cả việc DATA/migration.
+**Quy tắc (người dùng chốt khi review):** epic nào có MD LAB-5 thấp hơn LAB-1 quá 30% thì nâng MD LAB-5 lên bằng **70% của LAB-1**, tức chỉ cho giảm tối đa 30%. Epic giảm ít hơn 30% hoặc cao hơn LAB-1 giữ nguyên. Không áp cho FN-14 và DOC vì hai phần này không có epic ở LAB-5 (đã loại khỏi backlog, lý do ở bảng trên).
 
-| Vai trò | Việc lá | SWP | Giờ chưa buffer | Giờ sau buffer 30% | MD sau buffer (8h) | Tỷ lệ |
-|---|---:|---:|---:|---:|---:|---:|
-| BE | 145 | 792 | 1636,0 | 2126,8 | 265,9 | 50,3% |
-| QA | 50 | 297 | 594,0 | 772,2 | 96,5 | 18,3% |
-| FE | 69 | 296 | 556,5 | 723,5 | 90,4 | 17,1% |
-| INFRA | 22 | 126 | 302,5 | 393,3 | 49,2 | 9,3% |
-| PM (issue làm rõ) | 30 | 79 | 164,5 | 213,9 | 26,7 | 5,1% |
-| **Tổng** | **316** | **1590** | **3253,5** | **4229,6** | **528,7** | 100% |
+**Vì sao chặn:** mức giảm lớn đến từ giả định tái dùng prototype LAB-3. Giả định này chưa được kiểm trên kiến trúc đích (ECS + RDS + Redis thay cho Vercel + Supabase), nên không để một epic rơi quá xa mức LAB-1 đã chào.
 
-- BE + FE + QA sau buffer: 3622,5 giờ ≈ 452,8 MD.
-- Cùng buffer 30%, phần so được của LAB-1 là 501 × 1,3 = 651,3 MD, LAB-5 là 528,7 MD (thấp hơn khoảng 123 MD, cùng lý do ở trên).
+| Epic | LAB-1 (MD) | LAB-5 gốc (MD) | Mức giảm | Sàn 70% (MD) | LAB-5 sau chặn (MD) | Giờ sau chặn | Giờ thêm |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| #85 Bên tham gia và 許可/承認 | 42 | 11,1 | -73,7% | 29,4 | **29,4** | 235,2 | +146,7 |
+| #116 Lô hàng và đánh giá | 53 | 18,9 | -64,3% | 37,1 | **37,1** | 296,8 | +145,3 |
+| #182 Giao hàng | 40 | 18,2 | -54,4% | 28,0 | **28,0** | 224,0 | +78,0 |
+| #303 Báo cáo và xuất dữ liệu | 46 | 31,6 | -31,2% | 32,2 | **32,2** | 257,6 | +4,6 |
+| **Cộng 4 epic** | **181** | **79,9** | | | **126,7** | **1013,6** | **+374,6** |
+
+Các epic gần ngưỡng nhưng không bị chặn: #137 相対取引 -28,1%, #103 Master data -27,4%.
+
+**Kết quả:** tổng LAB-5 từ 3253,5 giờ (406,7 MD) lên **3628,1 giờ (453,5 MD)**, thêm 374,6 giờ (46,8 MD). Phần so được với LAB-1: 501 MD so với 453,5 MD, thấp hơn 47,5 MD (-9,5%).
+
+**Phạm vi áp dụng:** khoản chặn là **dự phòng ở cấp epic**, chỉ nằm trong tài liệu estimate này. SWP, trường "Giờ ước lượng" trên từng issue và kế hoạch 12 sprint **không đổi** (giữ nguyên theo quyết định không kéo dài kế hoạch). Khi chia khoản thêm về vai trò, giờ của từng vai trò trong epic bị chặn được nhân cùng một hệ số (giờ sau chặn / giờ gốc của epic đó).
+
+### Effort theo vai trò, sau chặn 30% và sau buffer 30%
+
+Buffer 30% là tỷ lệ đã chốt ở bảng task LAB-1. Buffer chỉ cộng ở cấp tổng hợp để so với LAB-1: trường "Giờ ước lượng" trên từng issue và kế hoạch 12 sprint vẫn dùng giờ **gốc, chưa chặn, chưa buffer** (quyết định giữ nguyên kế hoạch, không kéo dài thêm sprint). Vai trò lấy theo trường "Phụ trách" của việc lá; BE gồm cả việc DATA/migration. Giờ từng dòng làm tròn 0,1 nên tổng các dòng có thể lệch 0,1 so với dòng Tổng.
+
+| Vai trò | Việc lá | SWP | Giờ gốc | Giờ sau chặn 30% | Giờ sau chặn + buffer 30% | MD sau chặn + buffer (8h) | Tỷ lệ |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| BE | 145 | 792 | 1636,0 | 1850,7 | 2405,9 | 300,7 | 51,0% |
+| FE | 69 | 296 | 556,5 | 669,3 | 870,0 | 108,8 | 18,4% |
+| QA | 50 | 297 | 594,0 | 629,1 | 817,8 | 102,2 | 17,3% |
+| INFRA | 22 | 126 | 302,5 | 302,8 | 393,6 | 49,2 | 8,3% |
+| PM (issue làm rõ) | 30 | 79 | 164,5 | 176,3 | 229,2 | 28,7 | 4,9% |
+| **Tổng** | **316** | **1590** | **3253,5** | **3628,1** | **4716,5** | **589,6** | 100% |
+
+- BE + FE + QA sau chặn và buffer: 4093,7 giờ ≈ 511,7 MD.
+- Cùng buffer 30%, phần so được của LAB-1 là 501 × 1,3 = 651,3 MD, LAB-5 là 589,6 MD (thấp hơn khoảng 62 MD).
 - Vẫn chưa gồm BrSE và PSM (LAB-1: 290 + 87 MD sau buffer).
