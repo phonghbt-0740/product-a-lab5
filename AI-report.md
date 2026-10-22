@@ -26,12 +26,14 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 3. `tools/plan-sprints.py` thêm lượt xếp thứ hai: hạn của task BrSE là sprint ngay trước sprint dev đầu tiên của issue; số BrSE tăng dần tới khi mọi task kịp hạn. Kiểm lại 316/316 việc dev giữ nguyên sprint, người (đổi tên), điểm, giờ.
 4. Giả lập lại Sprint 1 với 19 task BrSE, tạo 119 issue mới, đổi lựa chọn trường Phụ trách và ghi lại trường cho 540 mục.
 
+**Thêm task BrSE hỗ trợ UAT.** Sau khi xem so sánh BrSE với LAB-1, tôi yêu cầu tính thêm phần hỗ trợ UAT. Agent hỏi độ hạt và thời điểm, rồi sinh 14 issue `[BrSE] Hỗ trợ UAT` (một issue mỗi epic E02–E15, phạm vi lấy từ danh sách màn và năng lực của epic), chấm bằng skill (lượt thứ ba, 5 worker), tôi duyệt 5 task mẫu, và `tools/plan-sprints.py` thêm lượt xếp thứ ba: sprint ngay sau sprint dev/QA cuối của epic. Kiểm lại: không việc nào khác đổi sprint, người, điểm hay giờ.
+
 **Ghi SWP và các trường lên Project.** Agent (phiên Claude Code này), không phải skill, làm bước ghi:
 
 - `tools/github-backlog-sync.py fields` đọc `plans/project-values.json` (Point, Giờ ước lượng, Phụ trách, Sprint, Status cho từng mã backlog) và gọi GraphQL `updateProjectV2ItemFieldValue` theo lô 3 mục (~15 lệnh ghi/request, đặt alias).
 - Chạy thử trước (không có `--apply`): script chỉ in 5 dòng đầu để tôi duyệt, rồi mới chạy `--apply`.
 - Có file tiến độ ghi giá trị đã ghi cho từng mã; chạy lại sau khi đứt mạng thì bỏ qua mục đã ghi đúng, không ghi trùng.
-- Sau khi ghi, agent đọc lại toàn bộ Project bằng GraphQL (`fieldValueByName` cho 5 trường) và so với `project-values.json`: 421/421 mục khớp, 0 chỗ lệch. Sau khi thêm task BrSE, đọc lại lần nữa cả 5 trường và quan hệ cha con: 540/540 mục khớp, 0 chỗ lệch.
+- Sau khi ghi, agent đọc lại toàn bộ Project bằng GraphQL (`fieldValueByName` cho 5 trường) và so với `project-values.json`: 421/421 mục khớp, 0 chỗ lệch. Sau khi thêm task BrSE, đọc lại lần nữa cả 5 trường và quan hệ cha con: 540/540 mục khớp, 0 chỗ lệch. Sau khi thêm 14 issue hỗ trợ UAT: 554/554 mục khớp, 0 chỗ lệch.
 
 ## 2. Review
 
@@ -51,6 +53,7 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 | 10 | Task BrSE review spec | Thêm cho 104 issue thường (bỏ 30 issue làm rõ); chấm SWP bằng skill; làm ở sprint ngay trước dev; số BrSE tính theo tải. Đổi tên người phụ trách giả định thành BE1…, FE1, QA1…, BrSE1… |
 | 11 | 5 task BrSE mẫu và hệ số giờ | Giữ nguyên cả 5 (3, 5, 16, 10, 10 SWP); chốt hệ số 1,3 giờ/SWP từ giờ ước trực tiếp của 5 mẫu |
 | 12 | Ghi lại lên GitHub | Xem bảng trước/sau (540 mục, 2228 SWP, 4088,5 giờ, Sprint 1 cam kết 261 SWP) rồi mới cho tạo 119 issue và ghi lại trường |
+| 13 | Task BrSE hỗ trợ UAT | Một issue mỗi epic nghiệp vụ (14), UAT cuốn chiếu ở sprint sau sprint cuối của epic; giữ nguyên cả 5 task mẫu (4, 8, 16, 16, 6 SWP); dùng chung hệ số BrSE 1,3; cho tạo 14 issue sau khi xem bảng trước/sau |
 
 **Vấn đề gặp ở kết quả AI/công cụ:**
 
@@ -85,12 +88,12 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 
 | Điểm yếu | Cải thiện |
 |---|---|
-| Tôi không đọc hết 540 mục; chỉ đọc bản duyệt dạng bảng và mẫu | Dự án thật: mỗi trưởng nhóm đọc epic của mình trước khi lên Project |
-| SWP chỉ được người duyệt trên 10 mẫu (5 mỗi lượt chấm) trong 420 việc lá | Tăng cỡ mẫu theo epic, cho mỗi epic ít nhất một mẫu; để đội tự chấm lại các việc có độ tin cậy thấp |
+| Tôi không đọc hết 554 mục; chỉ đọc bản duyệt dạng bảng và mẫu | Dự án thật: mỗi trưởng nhóm đọc epic của mình trước khi lên Project |
+| SWP chỉ được người duyệt trên 15 mẫu (5 mỗi lượt chấm) trong 434 việc lá | Tăng cỡ mẫu theo epic, cho mỗi epic ít nhất một mẫu; để đội tự chấm lại các việc có độ tin cậy thấp |
 | Hệ số giờ lấy từ 10 mẫu (và 5 mẫu cho BrSE) do AI ước và tôi duyệt, không phải đội thật; mỗi nhóm chỉ có 2 mẫu | Lấy số liệu giờ thật sau 2-3 sprint đầu để hiệu chỉnh lại |
 | Sprint 1 là giả lập theo kịch bản viết sẵn, burndown không phải số đo | Đo bằng dữ liệu thật từ sprint đầu tiên |
 | Skill chạy ở chế độ worker lệch chuẩn (agent chỉ đọc file) | Nâng cấp skill chia lô nhỏ hơn để dán vừa prompt |
 | Xếp sprint bỏ qua phụ thuộc chi tiết giữa các việc, chỉ dùng ràng buộc theo vai trò và theo issue | Dùng đồ thị phụ thuộc thật để xếp, và có người xem lại kế hoạch |
 | Thời gian đồng hồ chưa được ghi lại ở bản này | Ghi giờ thật theo tuần ngay từ đầu |
 
-**Chi phí token (xấp xỉ):** viết backlog 4 agent khoảng 1,35 triệu; ráp nối khoảng 0,39 triệu; chấm SWP 6 agent (5 lô + 1 lượt sửa) khoảng 1,0 triệu; chấm 104 task BrSE 5 agent khoảng 0,68 triệu; tài liệu khoảng 0,25 triệu. Tổng khoảng **3,6 triệu token**. Phần lớn nằm ở bước viết backlog và chấm SWP, nơi mỗi agent phải đọc nhiều spec.
+**Chi phí token (xấp xỉ):** viết backlog 4 agent khoảng 1,35 triệu; ráp nối khoảng 0,39 triệu; chấm SWP 6 agent (5 lô + 1 lượt sửa) khoảng 1,0 triệu; chấm 104 task BrSE 5 agent khoảng 0,68 triệu; chấm 14 task UAT 5 agent khoảng 0,49 triệu; tài liệu khoảng 0,3 triệu. Tổng khoảng **4,1 triệu token**. Phần lớn nằm ở bước viết backlog và chấm SWP, nơi mỗi agent phải đọc nhiều spec.

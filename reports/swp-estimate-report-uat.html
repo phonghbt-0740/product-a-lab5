@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estimate SWP — Task BrSE hỗ trợ UAT (tệp tham chiếu brse-uat-tasks.json, 14 task, mỗi epic nghiệp vụ một task)</title>
+<style>
+:root{--ink:#22303F;--muted:#5B6B7C;--paper:#F5F7F8;--card:#FFFFFF;--line:#DDE4E9;
+--build:#0C7E9E;--rework:#B45309;--ok:#15803D;--warncol:#CA8A04;--bad:#B91C1C;
+--chip1:#E9F1F4;--chip2:#CBE2EA;--chip3:#8FC2D2;--chip4:#0C7E9E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+main{max-width:1120px;margin:0 auto;padding:20px 20px 64px}
+h1,h2,h3{font-family:"Avenir Next","Segoe UI",system-ui,sans-serif;letter-spacing:-.015em}
+h1{font-size:28px;font-weight:700;margin:14px 0 4px}
+h2{font-size:20px;margin:40px 0 12px;display:flex;align-items:center;gap:10px;scroll-margin-top:64px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--muted);font-weight:600}
+.meta{color:var(--muted);font-size:13px;margin-bottom:18px}
+a{color:var(--build);text-decoration:none} a:hover,a:focus-visible{text-decoration:underline}
+:focus-visible{outline:2px solid var(--build);outline-offset:2px;border-radius:2px}
+.num,.axes,.chip,.hcount,.hlabel,.tile b,.v{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+nav{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--line);
+display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:8px 20px;font-size:13px}
+nav .links{display:flex;flex-wrap:wrap;gap:2px 14px} nav a{color:var(--ink);font-weight:600}
+.unitbox{margin-left:auto;display:flex;align-items:center;gap:6px}
+.unitbox input{width:64px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;font:inherit;text-align:right;background:var(--card);color:var(--ink)}
+#rate-wrap{display:none;align-items:center;gap:6px}
+body.hours #rate-wrap{display:inline-flex} body.hours .unit-note{display:block}
+.unit-note{display:none;font-size:12px;color:var(--warncol);font-weight:600}
+.thesis{font-size:18px;margin:16px 0 10px} .thesis b{color:var(--rework)}
+.compbar{display:flex;gap:2px;height:32px;border-radius:6px;overflow:hidden}
+.compbar .seg{display:flex;align-items:center;padding:0 12px;color:#fff;font-size:13px;font-weight:600;white-space:nowrap}
+.seg.build{background:var(--build);border-radius:6px 0 0 6px} .seg.rework{background:var(--rework);border-radius:0 6px 6px 0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.summary-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--build);border-radius:8px;padding:14px 18px;margin:18px 0}
+.summary-card h3{margin:0 0 8px;font-size:15px} .summary-card li{margin:4px 0;font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0 8px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:13px 16px}
+.tile b{display:block;font-size:24px;font-weight:700} .tile span{font-size:12.5px;color:var(--muted)}
+.tile.alert b{color:var(--bad)} .tile.warn b{color:var(--warncol)}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:24px;padding:0 7px;border-radius:12px;font-size:12.5px;font-weight:700;background:var(--chip1);color:var(--ink)}
+.chip.t2{background:var(--chip2)} .chip.t3{background:var(--chip3)} .chip.t4{background:var(--chip4);color:#fff}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card)}
+.card-table{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);background:var(--card)}
+th.num{text-align:right}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num{white-space:nowrap;text-align:right} td.axes{white-space:nowrap}
+th:first-child,td:first-child{padding-left:14px} td.title{min-width:260px}
+td.action{min-width:260px;font-size:12.5px;color:var(--muted)}
+button.sort{border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;padding:0}
+.flag{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.flag.contested{background:#FFF4DB;color:#8A5A00} .spread{font-size:11px;color:var(--muted);margin-left:6px;white-space:nowrap}
+.flag.split{background:#FBE9E9;color:var(--bad)} .flag.closed{background:#EAEEF1;color:var(--muted)}
+.conf{display:inline-flex;align-items:center;gap:5px;font-size:12.5px}
+.conf .dot{width:8px;height:8px;border-radius:50%}
+.conf.high .dot{background:var(--ok)} .conf.medium .dot{background:var(--warncol)} .conf.low .dot{background:var(--bad)}
+.conf.low{font-weight:700;color:var(--bad)}
+.hist{display:flex;gap:10px;align-items:flex-end;height:140px;padding:10px 4px 0;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-top:14px}
+.hbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.hfill{width:70%;max-width:56px;background:var(--build);border-radius:4px 4px 0 0;min-height:3px}
+.hcount{font-size:12px;font-weight:700} .hlabel{font-size:12px;color:var(--muted);padding-bottom:6px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;align-items:center}
+.controls input[type=search]{flex:1 1 220px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
+.controls select{min-height:36px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--card);color:inherit;font:inherit}
+.controls label{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.group{background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:14px}
+.group summary{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;cursor:pointer;padding:13px 16px;font-weight:600;list-style:none}
+.group summary::-webkit-details-marker{display:none}
+.group summary::before{content:"▸";color:var(--muted);margin-right:2px} .group[open] summary::before{content:"▾"}
+.g-meta{margin-left:auto;color:var(--muted);font-size:13px;font-weight:400} .g-meta b{color:var(--ink)}
+td.title details{margin-top:4px;font-size:12.5px} td.title summary{cursor:pointer;color:var(--build)}
+td.title details h4{margin:8px 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.audit{color:var(--muted)}
+.warning{color:var(--bad);font-weight:650}
+.note{font-size:13px;color:var(--muted)} .empty-state{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:26px;text-align:center}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+ul.plain{padding-left:18px;font-size:13.5px}
+.fbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:5px 13px;font:600 12.5px/1 inherit;cursor:pointer}
+.fbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+code{background:#EAEEF1;padding:2px 5px;border-radius:4px}
+footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;font-size:12.5px;color:var(--muted)}
+@media (max-width:640px){.compbar .seg{font-size:0;padding:0}.legend{flex-direction:column;gap:4px}h1{font-size:23px}nav{font-size:12px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media print{body{background:#fff}nav,.controls{display:none}.group{break-inside:avoid}details:not([open])>*:not(summary){display:block}}
+</style></head><body>
+<nav aria-label="Mục lục">
+  <div class="links">
+    <a href="#summary">Tổng quan</a><a href="#team">Team</a><a href="#risks">Rủi ro</a>
+    <a href="#issues">Chi tiết</a><a href="#calibration-audit">Hiệu chỉnh</a><a href="#caveats">Lưu ý</a>
+  </div>
+  <div class="unitbox">
+    <button class="fbtn" id="u-swp" aria-pressed="true" type="button">SWP</button>
+    <button class="fbtn" id="u-h" aria-pressed="false" type="button">Giờ</button>
+    <span id="rate-wrap"><label for="rate">1 SWP =</label>
+      <input id="rate" type="number" min="0.1" step="0.1" value="1.0"> <span>giờ</span></span>
+  </div>
+</nav>
+<main>
+<header>
+  <p class="eyebrow">file · Estimate SWP · Standard Work Point</p>
+  <h1>Estimate Report</h1>
+  <p class="meta">Nguồn: Task BrSE hỗ trợ UAT (tệp tham chiếu brse-uat-tasks.json, 14 task, mỗi epic nghiệp vụ một task) · Chấm điểm 2026-10-20T00:00:00Z · Hiệu chỉnh: <b>đã review, giữ nguyên</b></p>
+  <p class="meta">Mức xử lý: <b>medium</b></p>
+  <p class="unit-note">Đang xem theo GIỜ ước tính = SWP × rate (chưa có dữ liệu giờ lịch sử — rate mặc định 1, team tự chỉnh) — chỉ để tham khảo, không phải cam kết.</p>
+</header>
+<section id="scope"><h2>Phạm vi run</h2><ul>
+<li>Chế độ: <strong>closed=excluded; existing estimates=skipped</strong></li>
+<li>Quy tắc status: dùng state open/closed từ nguồn</li>
+<li>Kiểm tra estimate hiện có: nguồn estimate hiện có không khả dụng — vẫn estimate</li>
+<li>Filter phạm vi: không có</li>
+<li>Số issue bị loại theo từng cửa: không có</li>
+</ul></section>
+<section id="summary"><h2>Tổng quan</h2>
+  <div class="summary-card"><h3>Tóm tắt estimate</h3><ul><li>Tổng khối lượng ước lượng: <b><span class="v" data-swp="118">118</span></b> trên 14 work item (14 open, 0 closed) — trong đó Bug/Rework <b><span class="v" data-swp="0">0</span></b> (0%).</li><li>Khoảng bất định: <b><span class="v" data-swp="117">117</span>–<span class="v" data-swp="122">122</span></b> — dịch ±1 bậc SWP cho 1 item tin cậy vừa/thấp; 13 item tin cậy cao giữ nguyên điểm.</li></ul></div>
+  
+  
+  <p class="thesis">Bug/Rework chiếm <b>0%</b> khối lượng (<span class="v" data-swp="0">0</span>/<span class="v" data-swp="118">118</span>).</p>
+  <div class="compbar" role="img" aria-label="Kế hoạch 118 SWP, Bug/Rework 0 SWP">
+    <div class="seg build" style="flex:118">Build+Test · <span class="v" data-swp="118">118</span> (100%)</div>
+    <div class="seg rework" style="flex:1">Bug/Rework · <span class="v" data-swp="0">0</span> (0%)</div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--build)"></i>Kế hoạch — Build 0 item + Test/QA 14 item</span>
+    <span><i style="background:var(--rework)"></i>Bug/Rework — 0 item (subtotal riêng, không cộng vào tổng kế hoạch)</span>
+  </div>
+  
+  <div class="tiles">
+    <div class="tile"><b><span class="v" data-swp="118">118</span></b><span>Tổng khối lượng (14 item) · khoảng <span class="v" data-swp="117">117</span>–<span class="v" data-swp="122">122</span></span></div>
+    <div class="tile"><b>14/0</b><span>Open / Closed</span></div>
+    <div class="tile"><b>13/1/0</b><span>Tin cậy cao / vừa / thấp</span></div>
+    <div class="tile warn"><b>0</b><span>Item tin cậy thấp</span></div>
+    <div class="tile alert"><b>0</b><span>Đề xuất tách issue</span></div>
+  </div>
+  <h3>Theo loại issue</h3><div class="tablewrap card-table"><table>
+<thead><tr><th>Loại</th><th class="num">Số issue</th><th class="num">Khối lượng</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>Test/QA</td><td class="num">14</td><td class="num"><span class="v" data-swp="118">118</span></td><td>Khối lượng kiểm thử — tính vào tổng kế hoạch</td></tr><tr><td class="strong">TỔNG KẾ HOẠCH</td><td class="num strong">14</td><td class="num strong"><span class="v" data-swp="118">118</span></td><td>Build + Test/QA</td></tr><tr><td class="strong">TỔNG WORK ITEM</td><td class="num strong">14</td><td class="num strong"><span class="v" data-swp="118">118</span></td><td>Mọi work item được chấm trực tiếp</td></tr></tbody></table></div>
+  <div class="hist" role="img" aria-label="Phân bố SWP"><div class="hbar" title="2 item có 4 SWP"><span class="hcount">2</span><span class="hfill" style="height:50%"></span><span class="hlabel">4</span></div><div class="hbar" title="2 item có 5 SWP"><span class="hcount">2</span><span class="hfill" style="height:50%"></span><span class="hlabel">5</span></div><div class="hbar" title="2 item có 6 SWP"><span class="hcount">2</span><span class="hfill" style="height:50%"></span><span class="hlabel">6</span></div><div class="hbar" title="2 item có 8 SWP"><span class="hcount">2</span><span class="hfill" style="height:50%"></span><span class="hlabel">8</span></div><div class="hbar" title="4 item có 10 SWP"><span class="hcount">4</span><span class="hfill" style="height:100%"></span><span class="hlabel">10</span></div><div class="hbar" title="2 item có 16 SWP"><span class="hcount">2</span><span class="hfill" style="height:50%"></span><span class="hlabel">16</span></div></div><p class="note">Phân bố điểm theo mức SWP (trục hoành luôn hiển thị theo điểm).</p>
+  
+</section>
+
+
+<section id="issues"><h2>Chi tiết theo nhóm</h2>
+  <div class="controls">
+    <input id="search" type="search" placeholder="Tìm theo #ref hoặc tiêu đề…" aria-label="Tìm kiếm issue" autocomplete="off">
+    <label>Discipline <select id="discipline"><option value="">Tất cả</option><option value="QA">QA</option></select></label>
+    <label>Work type <select id="work-type"><option value="">Tất cả</option><option value="test-design">test-design</option></select></label>
+    <label>Confidence <select id="confidence"><option value="">Tất cả</option><option>high</option><option>medium</option><option>low</option></select></label>
+    <label>Hiệu chỉnh <select id="calibration"><option value="">Tất cả</option><option value="approved">issue mẫu — đã duyệt</option><option value="unchanged">không đổi</option></select></label>
+  </div>
+  
+<details class="group" open>
+  <summary><span class="g-title">Task/Bug độc lập (không thuộc epic/story)</span>
+    <span class="g-meta">14 item · <b><span class="v" data-swp="118">118</span></b></span></summary>
+  <div class="tablewrap"><table><thead><tr>
+<th class="num"><button class="sort" type="button" data-sort="finalSwp">SWP ↕</button></th>
+<th>Ref</th><th>Tiêu đề</th><th>Mảng</th><th>Loại</th><th>Tin cậy</th>
+</tr></thead><tbody data-rows id="standalone-rows">
+      <tr data-search="brse-uat-tasks.json#e02-u01 [brse] hỗ trợ uat: danh tính &amp; phân quyền nội bộ (đăng nhập, step-up, trang chủ, tài khoản, quyền) brse-uat-tasks.json#e02-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="approved" data-initial-swp="16"
+          data-final-swp="16">
+        <td class="num"><span class="chip t4">16</span></td>
+        <td class="ref">#E02-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Danh tính &amp; phân quyền nội bộ (đăng nhập, step-up, trang chủ, tài khoản, quyền) <details><summary>Chi tiết</summary><p class="audit">Điểm: 16 SWP (mức khó) · hiệu chỉnh: issue mẫu — đã duyệt · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E02-U01 · activity: unit-test</p><p>Scope: 5 màn (SCR-001/005/004/002/003) cộng 3 năng lực xuyên màn (Cognito, danh mục quyền, khóa tài khoản/hết phiên) là phạm vi UAT rộng, nhiều vai trò. Complexity: hỗ trợ cần kịch bản đa vai trò, step-up TOTP, ràng buộc 許可≠承認, 4 vai trò/2 cấp, chặn SYS-ADMIN cuối cùng, nhưng không có bằng chứng cụ thể cho C5.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e13-u01 [brse] hỗ trợ uat: báo cáo &amp; xuất dữ liệu — khung báo cáo dùng chung, 12 định nghĩa báo cáo (trừ rpt-07), xuất kế toán if-acc-01 brse-uat-tasks.json#e13-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="medium"
+          data-calibration="approved" data-initial-swp="16"
+          data-final-swp="16">
+        <td class="num"><span class="chip t4">16</span></td>
+        <td class="ref">#E13-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Báo cáo &amp; xuất dữ liệu — khung báo cáo dùng chung, 12 định nghĩa báo cáo (trừ RPT-07), xuất kế toán IF-ACC-01 <details><summary>Chi tiết</summary><p class="audit">Điểm: 16 SWP (mức khó) · hiệu chỉnh: issue mẫu — đã duyệt · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E13-U01 · activity: unit-test</p><p>Scope: 12 màn báo cáo (SCR-100..112, trừ 107) và 3 năng lực xuyên màn (khung dùng chung, xuất kế toán IF-ACC-01 qua SFTP/ACK, job nền), ma trận quyền theo báo cáo nên S8. Complexity: nhiều bẫy nghiệp vụ (相対 trước せり, 許可/承認 tách trục, bốn vai trò, ngày ghi sổ so với ngày giao dịch), quyền theo cột/nhánh, SFTP thử lại ≤ 3 và chống gửi trùng, cột báo cáo còn MOCK A18, nên C3; các màn đều chỉ đọc nên không lên C5.</p><h4>Assumptions</h4><ul><li>Định dạng file kế toán (A17) và SFTP/ACK (A19) chờ KH xác nhận nhưng không đẩy độ khó lên mức cao hơn</li></ul><h4>Gaps</h4><ul><li>Cột báo cáo là đề xuất (A18, MOCK)</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf medium"><span class="dot"></span>vừa</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e06-u01 [brse] hỗ trợ uat: 相対取引 — bàn giao dịch thỏa thuận (luồng chính) brse-uat-tasks.json#e06-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="10"
+          data-final-swp="10">
+        <td class="num"><span class="chip t3">10</span></td>
+        <td class="ref">#E06-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: 相対取引 — bàn giao dịch thỏa thuận (luồng chính) <details><summary>Chi tiết</summary><p class="audit">Điểm: 10 SWP (mức vừa) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E06-U01 · activity: unit-test</p><p>Scope 5: UAT 2 màn (SCR-030, SCR-031) cộng 4 năng lực xuyên màn (máy trạng thái, tính tiền thuế, engine BR-PERM-01, RPC chốt/hủy nguyên tử, kiểm thử tranh chấp). Complexity 3: luồng chính 相対 có đủ bốn bẫy §3.1-§3.4, 許可 và 承認 hai trục kiểm tại thời điểm chốt, trừ tồn nguyên tử, tranh chấp đồng thời, nhiều giả định MOCK còn mở (A26, DOM-Q13, FT-031), kịch bản đa vai trò.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e09-u01 [brse] hỗ trợ uat: đối chiếu, khóa ngày, thanh toán và tranh chấp (紛争) brse-uat-tasks.json#e09-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="10"
+          data-final-swp="10">
+        <td class="num"><span class="chip t3">10</span></td>
+        <td class="ref">#E09-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Đối chiếu, khóa ngày, thanh toán và tranh chấp (紛争) <details><summary>Chi tiết</summary><p class="audit">Điểm: 10 SWP (mức vừa) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E09-U01 · activity: unit-test</p><p>Scope 5: UAT 5 màn (SCR-060/061/063/081/062) cộng 1 năng lực xuyên màn (payments và snapshot điều khoản), thành một luồng đối chiếu-khóa ngày-thanh toán-紛争. Complexity 3: khóa ngày có 7 loại blocker và step-up, closer ≠ opener, SLA 5 ngày chợ mở, blocker undelivered còn MOCK/giả định chờ KH, thứ tự 相対 trước せり, nhập CSV.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e11-u01 [brse] hỗ trợ uat: 完納奨励金 — engine tính, run → công bố, chênh lệch kỳ sau (ràng buộc đặc thù) brse-uat-tasks.json#e11-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="10"
+          data-final-swp="10">
+        <td class="num"><span class="chip t3">10</span></td>
+        <td class="ref">#E11-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: 完納奨励金 — engine tính, run → công bố, chênh lệch kỳ sau (ràng buộc đặc thù) <details><summary>Chi tiết</summary><p class="audit">Điểm: 10 SWP (mức vừa) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E11-U01 · activity: unit-test</p><p>Scope: 2 màn (SCR-080, SCR-107) cùng 8 năng lực xuyên màn (engine, lược đồ run, compute/discard, publish, dòng chênh lệch kỳ sau, test vector, phiên bản biểu suất, job cuối kỳ) tạo thành một luồng hoàn chỉnh nên S5. Complexity: người trong vòng lặp (công bố ≠ tính, không tự công bố), run bất biến và có trạng thái nháp/công bố, công thức 完納奨励金 còn MOCK chờ KH, nên C3; không có bằng chứng đủ cho C5.</p><h4>Assumptions</h4><ul><li>KH tự chạy UAT; BrSE chỉ chuẩn bị kịch bản, tiếp nhận và phân loại phản hồi</li></ul><h4>Gaps</h4><ul><li>Tỷ lệ bậc và tiêu chí bậc chưa có test vector Phụ lục C (Q-C7)</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e15-u01 [brse] hỗ trợ uat: thông báo — hộp thư in-app, email bất đồng bộ, cấu hình có phiên bản, log gửi, cảnh báo vận hành brse-uat-tasks.json#e15-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="10"
+          data-final-swp="10">
+        <td class="num"><span class="chip t3">10</span></td>
+        <td class="ref">#E15-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Thông báo — hộp thư in-app, email bất đồng bộ, cấu hình có phiên bản, log gửi, cảnh báo vận hành <details><summary>Chi tiết</summary><p class="audit">Điểm: 10 SWP (mức vừa) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E15-U01 · activity: unit-test</p><p>Scope: UAT 3 màn (SCR-130/131/132) cộng 4 năng lực xuyên màn (outbox, worker email SES, nguồn sự kiện nền, ops_alerts) tạo thành một workflow thông báo hoàn chỉnh nên chọn 5. Complexity: kịch bản bất đồng bộ (thử lại 1+3, dead, cảnh báo), cấu hình có phiên bản bất biến, Critical gửi trong 5 phút, phân quyền theo 4 vai trò/2 cấp (Q-C5), 許可/承認 đúng trục theo bên, nguyên tắc hệ thống chỉ nhắc nên cần hướng dẫn KH nhiều và kiểm chứng cẩn thận nên chọn 3.</p><h4>Assumptions</h4><ul><li>Phần gửi email SES có thể được KH kiểm qua môi trường thử, chưa rõ chi tiết</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e05-u01 [brse] hỗ trợ uat: lô hàng và 目利き (đánh giá do con người) brse-uat-tasks.json#e05-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="approved" data-initial-swp="8"
+          data-final-swp="8">
+        <td class="num"><span class="chip t3">8</span></td>
+        <td class="ref">#E05-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Lô hàng và 目利き (đánh giá do con người) <details><summary>Chi tiết</summary><p class="audit">Điểm: 8 SWP (mức vừa) · hiệu chỉnh: issue mẫu — đã duyệt · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E05-U01 · activity: unit-test</p><p>Scope 5: UAT 4 màn (SCR-020..023) cộng 1 năng lực xuyên màn là vòng đời trạng thái lô và lot_status_history, tạo thành một luồng hoàn chỉnh. Complexity 2: nhiều bẫy nghiệp vụ (§3.2 người nhập 目利き, §3.1, §3.4 cờ may_sell, BR-LOT-02, BR-CLOSE-01) và bảng 4 mức MOCK, nhưng chỉ một vai trò chính và không có phê duyệt hay step-up.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e14-u01 [brse] hỗ trợ uat: audit &amp; truy vết (chuẩn ghi, phân vùng 7 năm, scr-120 tra cứu, scr-121 chi tiết) brse-uat-tasks.json#e14-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="8"
+          data-final-swp="8">
+        <td class="num"><span class="chip t3">8</span></td>
+        <td class="ref">#E14-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Audit &amp; truy vết (chuẩn ghi, phân vùng 7 năm, SCR-120 tra cứu, SCR-121 chi tiết) <details><summary>Chi tiết</summary><p class="audit">Điểm: 8 SWP (mức vừa) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E14-U01 · activity: unit-test</p><p>Scope: UAT 2 màn chỉ đọc (SCR-120, SCR-121) cộng 4 năng lực xuyên màn (chuẩn ghi audit, phân vùng 7 năm, kiểm phủ/backfill, metadata tệp đính kèm) thành một luồng hoàn chỉnh nên chọn 5. Complexity: màn chỉ trình bày, nhưng cần giữ đúng nhãn 許可/承認/決裁, bẫy 相対/せり, snapshot điều khoản thanh toán, audit cho thao tác bị chặn, rule_version_id 完納奨励金 (do E11 ghi) và nguyên tắc con người trong vòng lặp nên chọn 2.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e03-u01 [brse] hỗ trợ uat: bên tham gia và hiệu lực 許可/承認 brse-uat-tasks.json#e03-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="approved" data-initial-swp="6"
+          data-final-swp="6">
+        <td class="num"><span class="chip t3">6</span></td>
+        <td class="ref">#E03-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Bên tham gia và hiệu lực 許可/承認 <details><summary>Chi tiết</summary><p class="audit">Điểm: 6 SWP (mức vừa) · hiệu chỉnh: issue mẫu — đã duyệt · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E03-U01 · activity: unit-test</p><p>Scope: 3 màn (SCR-010/011/012) và 1 năng lực xuyên màn (mô hình hai cấp + engine hiệu lực). Complexity: bẫy 許可/承認 tách hai trục hiệu lực, 4 vai trò/2 cấp là giả định, BR-PERM-01 kiểm tại thời điểm chốt, con người nhập lý do; cần kịch bản vòng đời và ngày hiệu lực cẩn thận.</p><h4>Assumptions</h4><ul><li>Ranh giới cấp 1/cấp 2 là giả định chưa được KH xác nhận</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e10-u01 [brse] hỗ trợ uat: điều chỉnh sau chốt — lập yêu cầu, 決裁 hai cấp, ngưỡng cấu hình có phiên bản brse-uat-tasks.json#e10-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="6"
+          data-final-swp="6">
+        <td class="num"><span class="chip t3">6</span></td>
+        <td class="ref">#E10-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Điều chỉnh sau chốt — lập yêu cầu, 決裁 hai cấp, ngưỡng cấu hình có phiên bản <details><summary>Chi tiết</summary><p class="audit">Điểm: 6 SWP (mức vừa) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E10-U01 · activity: unit-test</p><p>Scope 3: UAT 3 màn (SCR-070/071/072) và 1 năng lực xuyên màn là guard chặn ghi vào ngày đã khóa (FT-072) kèm ma trận kiểm thử. Complexity 3: 決裁 hai cấp với ba người khác nhau (cần SETTLEMENT-MGR thứ hai), ngưỡng cấu hình có phiên bản và ngày hiệu lực, cấp 2 khi lớn hơn hẳn ngưỡng, dòng đảo và dòng điều chỉnh, không dùng chữ 承認/許可.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e07-u01 [brse] hỗ trợ uat: せり — luồng phụ: nhập kết quả, tra cứu, import hàng loạt brse-uat-tasks.json#e07-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="5"
+          data-final-swp="5">
+        <td class="num"><span class="chip t2">5</span></td>
+        <td class="ref">#E07-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: せり — luồng phụ: nhập kết quả, tra cứu, import hàng loạt <details><summary>Chi tiết</summary><p class="audit">Điểm: 5 SWP (mức dễ) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E07-U01 · activity: unit-test</p><p>Scope 3: UAT 3 màn (SCR-040, 041, 042), không có năng lực xuyên màn riêng, luồng phụ cố ý mỏng. Complexity 2: nhiều trạng thái và edge case (import validate, preview, người xác nhận kèm step-up, winner_not_seri_eligible theo cờ may_win_seri, 許可/承認 theo ngày ghi, BR-LOT-02 và BR-CLOSE-01), ranh giới cấp 1 là MOCK, nhưng không có tranh chấp đồng thời hay tích hợp ngoài.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e08-u01 [brse] hỗ trợ uat: giao hàng (引渡し) — theo dõi, ghi nhận từng lần, ngoại lệ, truy vết tới tất toán brse-uat-tasks.json#e08-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="5"
+          data-final-swp="5">
+        <td class="num"><span class="chip t2">5</span></td>
+        <td class="ref">#E08-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Giao hàng (引渡し) — theo dõi, ghi nhận từng lần, ngoại lệ, truy vết tới tất toán <details><summary>Chi tiết</summary><p class="audit">Điểm: 5 SWP (mức dễ) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E08-U01 · activity: unit-test</p><p>Scope 3: UAT 4 màn giao hàng (SCR-050..053), không có năng lực xuyên màn. Complexity 2: ngoại lệ do người nêu ≠ người xác nhận, nhãn MOCK dung sai 0, truy vết giao hàng tới thanh toán, áp cho cả 相対 và せり; không có phê duyệt nhiều cấp hay step-up.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e04-u01 [brse] hỗ trợ uat: dữ liệu nền (master): lịch chợ, mặt hàng, điều khoản thanh toán brse-uat-tasks.json#e04-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="approved" data-initial-swp="4"
+          data-final-swp="4">
+        <td class="num"><span class="chip t2">4</span></td>
+        <td class="ref">#E04-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Dữ liệu nền (master): lịch chợ, mặt hàng, điều khoản thanh toán <details><summary>Chi tiết</summary><p class="audit">Điểm: 4 SWP (mức dễ) · hiệu chỉnh: issue mẫu — đã duyệt · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E04-U01 · activity: unit-test</p><p>Scope: 3 màn master (SCR-140/141/142) và 1 năng lực xuyên màn (chuẩn hóa đầu vào, ánh xạ lỗi). Complexity: màn master tương đối đơn giản; thêm chút phức tạp do BR-CLOSE-01 ngày đã khóa, điều khoản theo nhóm bên tham gia, bản ghi hiệu lực theo ngày và dữ liệu MOCK cần giải thích, không có đa vai trò hay duyệt.</p><h4>Assumptions</h4><ul><li>Không có assumption</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr>
+      <tr data-search="brse-uat-tasks.json#e12-u01 [brse] hỗ trợ uat: quy tắc và biểu suất (業務規程) — quy trình phiên bản: nháp, trình, 決裁, ngày hiệu lực, rollback brse-uat-tasks.json#e12-u01 unit-test qa test-design" data-discipline="QA"
+          data-work-type="test-design" data-confidence="high"
+          data-calibration="unchanged" data-initial-swp="4"
+          data-final-swp="4">
+        <td class="num"><span class="chip t2">4</span></td>
+        <td class="ref">#E12-U01</td>
+        <td class="title">[BrSE] Hỗ trợ UAT: Quy tắc và biểu suất (業務規程) — quy trình phiên bản: nháp, trình, 決裁, ngày hiệu lực, rollback <details><summary>Chi tiết</summary><p class="audit">Điểm: 4 SWP (mức dễ) · hiệu chỉnh: không đổi · căn cứ: EXTRACTED · function: brse-uat-tasks.json#E12-U01 · activity: unit-test</p><p>Scope: 2 màn (SCR-090, SCR-091) và 1 năng lực xuyên màn (quy trình phiên bản theo rule_kind), cùng một luồng nên S2. Complexity: người lập ≠ người quyết, 否決 bắt buộc có ý kiến, step-up mỗi lần quyết định (TOTP MOCK), hiệu lực từ ngày sau, mỗi ngày một bản 可決, kèm bẫy 許可 ≠ 承認 về đặt tên, nên C3.</p><h4>Assumptions</h4><ul><li>Nội dung 完納奨励金 thuộc E11, không tính vào UAT này</li></ul><h4>Gaps</h4><ul><li>Không có gap</li></ul><h4>Supporting evidence</h4><ul><li>Không có historical evidence</li></ul><h4>Provenance</h4><p>file · full · fields: body, labels, title</p></details></td>
+        <td>QA</td>
+        <td>test</td>
+        <td><span class="conf high"><span class="dot"></span>cao</span></td>
+      </tr></tbody></table></div>
+</details>
+  
+</section>
+<section id="methodology"><h2>Phương pháp</h2>
+<p>Mỗi work item nhận một điểm khối lượng chuẩn — <strong>Standard Work Point (SWP)</strong> — chấm theo cùng một bảng chuẩn cố định, nên cùng một mô tả công việc luôn ra cùng một điểm. Điểm càng cao, việc càng nặng; trên báo cáo, điểm được diễn giải theo thang 5 mức: <strong>rất dễ</strong> (1–2), <strong>dễ</strong> (3–5), <strong>vừa</strong> (6–12), <strong>khó</strong> (13–25), <strong>rất khó</strong> (26+). User Story/Epic không được chấm trực tiếp — điểm của chúng là tổng điểm các task con. Quy đổi giờ trên báo cáo chỉ là tham khảo theo rate người xem tự đặt, không phải cam kết.</p>
+<details><summary>Chi tiết kỹ thuật (cách tính điểm)</summary><p class="note">SWP được tra từ ma trận Scope × Complexity 6×6 (Scope bands: 1, 2, 3, 5, 8, 13 — độ rộng công việc; Complexity bands: 0, 1, 2, 3, 5, 8 — độ khó bên trong phạm vi đó); mỗi ô = Scope × hệ số Complexity (×1, ×1.25, ×1.5, ×2, ×3, ×5) làm tròn về số nguyên — không snap Fibonacci; giá trị hợp lệ: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 20, 24, 25, 26, 39, 40, 65. Confidence và historical evidence không thay đổi điểm. Hai trục Scope/Complexity của từng issue nằm trong audit payload nhúng cuối trang.</p></details></section>
+<section id="calibration-audit"><h2>Hiệu chỉnh theo issue mẫu (Calibration)</h2>
+<p class="note">Hệ thống chọn ra tối đa 5 issue mẫu đại diện cho cả tập; với mỗi issue mẫu, người dùng chọn mức độ khó (rất dễ → rất khó) rồi chốt điểm cụ thể trong dải điểm của mức đó, và điểm của các issue tương tự được hiệu chỉnh theo. Đây là bước để estimate phản ánh cảm nhận thực tế của team thay vì chỉ nội dung ticket.</p>
+<p>Trạng thái: <strong>đã review, giữ nguyên</strong> · Số issue đổi điểm sau hiệu chỉnh: <strong>0</strong> · Số issue mẫu: <strong>5</strong></p>
+<h3>Issue mẫu</h3><div class="tablewrap card-table"><table><thead><tr><th class="num">SWP</th><th>Ref</th><th>Tiêu đề</th><th>Độ khó</th><th>Vì sao được chọn làm mẫu</th></tr></thead><tbody><tr><td class="num"><span class="chip t2">4</span></td><td class="ref">#E04-U01</td><td class="title">[BrSE] Hỗ trợ UAT: Dữ liệu nền (master): lịch chợ, mặt hàng, điều khoản thanh toán</td><td>dễ</td><td>issue nhỏ nhất</td></tr><tr><td class="num"><span class="chip t3">8</span></td><td class="ref">#E05-U01</td><td class="title">[BrSE] Hỗ trợ UAT: Lô hàng và 目利き (đánh giá do con người)</td><td>vừa</td><td>mức trung vị</td></tr><tr><td class="num"><span class="chip t4">16</span></td><td class="ref">#E13-U01</td><td class="title">[BrSE] Hỗ trợ UAT: Báo cáo &amp; xuất dữ liệu — khung báo cáo dùng chung, 12 định nghĩa báo cáo (trừ RPT-07), xuất kế toán IF-ACC-01</td><td>khó</td><td>issue lớn nhất</td></tr><tr><td class="num"><span class="chip t4">16</span></td><td class="ref">#E02-U01</td><td class="title">[BrSE] Hỗ trợ UAT: Danh tính &amp; phân quyền nội bộ (đăng nhập, step-up, trang chủ, tài khoản, quyền)</td><td>khó</td><td>khác biệt nhất so với mặt bằng</td></tr><tr><td class="num"><span class="chip t3">6</span></td><td class="ref">#E03-U01</td><td class="title">[BrSE] Hỗ trợ UAT: Bên tham gia và hiệu lực 許可/承認</td><td>vừa</td><td>độ tin cậy thấp nhất</td></tr></tbody></table></div>
+<div class="cols2"><div><h3>Điều chỉnh của người dùng</h3><ul class="plain"><li>#E02-U01: 16 SWP → 16 SWP (mức khó) · áp dụng cho các issue tương tự · Accepted without changes.</li><li>#E03-U01: 6 SWP → 6 SWP (mức vừa) · áp dụng cho các issue tương tự · Accepted without changes.</li><li>#E04-U01: 4 SWP → 4 SWP (mức dễ) · áp dụng cho các issue tương tự · Accepted without changes.</li><li>#E05-U01: 8 SWP → 8 SWP (mức vừa) · áp dụng cho các issue tương tự · Accepted without changes.</li><li>#E13-U01: 16 SWP → 16 SWP (mức khó) · áp dụng cho các issue tương tự · Accepted without changes.</li></ul></div>
+<div><h3>Quy tắc đã áp dụng</h3><ul class="plain"><li>Không có</li></ul></div></div></section>
+<section id="provenance"><h2>Provenance</h2><p>Source family: file. Raw issue bodies and tool transcripts are intentionally omitted from this artifact.</p></section>
+<section id="caveats"><h2>Lưu ý &amp; giới hạn</h2><ul class="plain"><li>Takumi composition: confidence=composed; ask-expert=not-needed</li><li>Lượt chấm thứ ba cho 14 task BrSE hỗ trợ UAT (E02–E15, mỗi epic nghiệp vụ một task), nguồn là tệp tham chiếu sinh từ backlog YAML trước khi tạo issue trên GitHub.</li><li>Worker: 5 agent sonnet theo kế hoạch lô của skill, mỗi agent chỉ đọc file lô của mình và 2 tài liệu quy tắc chấm; prompt worker thêm hướng dẫn riêng cho việc hỗ trợ UAT (ngành QA, workType test-design, phạm vi theo số màn và năng lực của epic).</li><li>Không đẩy điểm lên KPI Insight (--no-push-kpi; nguồn tệp không có ánh xạ KPI Insight).</li></ul></section>
+<footer>Estimate SWP — run read-only, không thay đổi dữ liệu nguồn. Mọi con số chiếu từ audit payload nhúng trong trang.</footer>
+<script id="report-data" type="application/json">{"calibrationRules":[],"caveats":["Takumi composition: confidence=composed; ask-expert=not-needed","Lượt chấm thứ ba cho 14 task BrSE hỗ trợ UAT (E02–E15, mỗi epic nghiệp vụ một task), nguồn là tệp tham chiếu sinh từ backlog YAML trước khi tạo issue trên GitHub.","Worker: 5 agent sonnet theo kế hoạch lô của skill, mỗi agent chỉ đọc file lô của mình và 2 tài liệu quy tắc chấm; prompt worker thêm hướng dẫn riêng cho việc hỗ trợ UAT (ngành QA, workType test-design, phạm vi theo số màn và năng lực của epic).","Không đẩy điểm lên KPI Insight (--no-push-kpi; nguồn tệp không có ánh xạ KPI Insight)."],"corrections":[{"approvedComplexity":3,"approvedScope":8,"issueSpecific":false,"rationale":"Accepted without changes.","representative":{"issueRef":"brse-uat-tasks.json#E02-U01","sourceType":"file"}},{"approvedComplexity":3,"approvedScope":3,"issueSpecific":false,"rationale":"Accepted without changes.","representative":{"issueRef":"brse-uat-tasks.json#E03-U01","sourceType":"file"}},{"approvedComplexity":1,"approvedScope":3,"issueSpecific":false,"rationale":"Accepted without changes.","representative":{"issueRef":"brse-uat-tasks.json#E04-U01","sourceType":"file"}},{"approvedComplexity":2,"approvedScope":5,"issueSpecific":false,"rationale":"Accepted without changes.","representative":{"issueRef":"brse-uat-tasks.json#E05-U01","sourceType":"file"}},{"approvedComplexity":3,"approvedScope":8,"issueSpecific":false,"rationale":"Accepted without changes.","representative":{"issueRef":"brse-uat-tasks.json#E13-U01","sourceType":"file"}}],"issues":[{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":3,"approvedScope":8,"complexityBandDelta":0,"isRepresentative":true,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":["outlier"],"status":"approved"},"complexitySignature":["stateful","external-integration"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":16,"finalScope":8,"functionRef":"brse-uat-tasks.json#E02-U01","gaps":[],"initialComplexity":3,"initialSWP":16,"initialScope":8,"issueRef":"brse-uat-tasks.json#E02-U01","issueType":"task","labels":["area:identity","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: 5 màn (SCR-001/005/004/002/003) cộng 3 năng lực xuyên màn (Cognito, danh mục quyền, khóa tài khoản/hết phiên) là phạm vi UAT rộng, nhiều vai trò. Complexity: hỗ trợ cần kịch bản đa vai trò, step-up TOTP, ràng buộc 許可≠承認, 4 vai trò/2 cấp, chặn SYS-ADMIN cuối cùng, nhưng không có bằng chứng cụ thể cho C5.","scopeSignature":["multi-component","cross-layer","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Danh tính \u0026 phân quyền nội bộ (đăng nhập, step-up, trang chủ, tài khoản, quyền)","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":["Ranh giới cấp 1/cấp 2 là giả định chưa được KH xác nhận"],"calibration":{"approvedComplexity":3,"approvedScope":3,"complexityBandDelta":0,"isRepresentative":true,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":["lowest-confidence"],"status":"approved"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":6,"finalScope":3,"functionRef":"brse-uat-tasks.json#E03-U01","gaps":[],"initialComplexity":3,"initialSWP":6,"initialScope":3,"issueRef":"brse-uat-tasks.json#E03-U01","issueType":"task","labels":["area:party","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: 3 màn (SCR-010/011/012) và 1 năng lực xuyên màn (mô hình hai cấp + engine hiệu lực). Complexity: bẫy 許可/承認 tách hai trục hiệu lực, 4 vai trò/2 cấp là giả định, BR-PERM-01 kiểm tại thời điểm chốt, con người nhập lý do; cần kịch bản vòng đời và ngày hiệu lực cẩn thận.","scopeSignature":["multi-component","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Bên tham gia và hiệu lực 許可/承認","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":1,"approvedScope":3,"complexityBandDelta":0,"isRepresentative":true,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":["minimum"],"status":"approved"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":1,"finalSWP":4,"finalScope":3,"functionRef":"brse-uat-tasks.json#E04-U01","gaps":[],"initialComplexity":1,"initialSWP":4,"initialScope":3,"issueRef":"brse-uat-tasks.json#E04-U01","issueType":"task","labels":["area:master","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: 3 màn master (SCR-140/141/142) và 1 năng lực xuyên màn (chuẩn hóa đầu vào, ánh xạ lỗi). Complexity: màn master tương đối đơn giản; thêm chút phức tạp do BR-CLOSE-01 ngày đã khóa, điều khoản theo nhóm bên tham gia, bản ghi hiệu lực theo ngày và dữ liệu MOCK cần giải thích, không có đa vai trò hay duyệt.","scopeSignature":["multi-component","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Dữ liệu nền (master): lịch chợ, mặt hàng, điều khoản thanh toán","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":2,"approvedScope":5,"complexityBandDelta":0,"isRepresentative":true,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":["lower-median"],"status":"approved"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":2,"finalSWP":8,"finalScope":5,"functionRef":"brse-uat-tasks.json#E05-U01","gaps":[],"initialComplexity":2,"initialSWP":8,"initialScope":5,"issueRef":"brse-uat-tasks.json#E05-U01","issueType":"task","labels":["area:lot","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope 5: UAT 4 màn (SCR-020..023) cộng 1 năng lực xuyên màn là vòng đời trạng thái lô và lot_status_history, tạo thành một luồng hoàn chỉnh. Complexity 2: nhiều bẫy nghiệp vụ (§3.2 người nhập 目利き, §3.1, §3.4 cờ may_sell, BR-LOT-02, BR-CLOSE-01) và bảng 4 mức MOCK, nhưng chỉ một vai trò chính và không có phê duyệt hay step-up.","scopeSignature":["multi-component"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Lô hàng và 目利き (đánh giá do con người)","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful","concurrency"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":10,"finalScope":5,"functionRef":"brse-uat-tasks.json#E06-U01","gaps":[],"initialComplexity":3,"initialSWP":10,"initialScope":5,"issueRef":"brse-uat-tasks.json#E06-U01","issueType":"task","labels":["area:aitai","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope 5: UAT 2 màn (SCR-030, SCR-031) cộng 4 năng lực xuyên màn (máy trạng thái, tính tiền thuế, engine BR-PERM-01, RPC chốt/hủy nguyên tử, kiểm thử tranh chấp). Complexity 3: luồng chính 相対 có đủ bốn bẫy §3.1-§3.4, 許可 và 承認 hai trục kiểm tại thời điểm chốt, trừ tồn nguyên tử, tranh chấp đồng thời, nhiều giả định MOCK còn mở (A26, DOM-Q13, FT-031), kịch bản đa vai trò.","scopeSignature":["multi-component"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: 相対取引 — bàn giao dịch thỏa thuận (luồng chính)","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":2,"finalSWP":5,"finalScope":3,"functionRef":"brse-uat-tasks.json#E07-U01","gaps":[],"initialComplexity":2,"initialSWP":5,"initialScope":3,"issueRef":"brse-uat-tasks.json#E07-U01","issueType":"task","labels":["area:seri","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope 3: UAT 3 màn (SCR-040, 041, 042), không có năng lực xuyên màn riêng, luồng phụ cố ý mỏng. Complexity 2: nhiều trạng thái và edge case (import validate, preview, người xác nhận kèm step-up, winner_not_seri_eligible theo cờ may_win_seri, 許可/承認 theo ngày ghi, BR-LOT-02 và BR-CLOSE-01), ranh giới cấp 1 là MOCK, nhưng không có tranh chấp đồng thời hay tích hợp ngoài.","scopeSignature":["multi-component"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: せり — luồng phụ: nhập kết quả, tra cứu, import hàng loạt","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":2,"finalSWP":5,"finalScope":3,"functionRef":"brse-uat-tasks.json#E08-U01","gaps":[],"initialComplexity":2,"initialSWP":5,"initialScope":3,"issueRef":"brse-uat-tasks.json#E08-U01","issueType":"task","labels":["area:giao-hang","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope 3: UAT 4 màn giao hàng (SCR-050..053), không có năng lực xuyên màn. Complexity 2: ngoại lệ do người nêu ≠ người xác nhận, nhãn MOCK dung sai 0, truy vết giao hàng tới thanh toán, áp cho cả 相対 và せり; không có phê duyệt nhiều cấp hay step-up.","scopeSignature":["multi-component"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Giao hàng (引渡し) — theo dõi, ghi nhận từng lần, ngoại lệ, truy vết tới tất toán","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":10,"finalScope":5,"functionRef":"brse-uat-tasks.json#E09-U01","gaps":[],"initialComplexity":3,"initialSWP":10,"initialScope":5,"issueRef":"brse-uat-tasks.json#E09-U01","issueType":"task","labels":["area:doi-chieu","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope 5: UAT 5 màn (SCR-060/061/063/081/062) cộng 1 năng lực xuyên màn (payments và snapshot điều khoản), thành một luồng đối chiếu-khóa ngày-thanh toán-紛争. Complexity 3: khóa ngày có 7 loại blocker và step-up, closer ≠ opener, SLA 5 ngày chợ mở, blocker undelivered còn MOCK/giả định chờ KH, thứ tự 相対 trước せり, nhập CSV.","scopeSignature":["multi-component"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Đối chiếu, khóa ngày, thanh toán và tranh chấp (紛争)","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":6,"finalScope":3,"functionRef":"brse-uat-tasks.json#E10-U01","gaps":[],"initialComplexity":3,"initialSWP":6,"initialScope":3,"issueRef":"brse-uat-tasks.json#E10-U01","issueType":"task","labels":["area:dieu-chinh","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope 3: UAT 3 màn (SCR-070/071/072) và 1 năng lực xuyên màn là guard chặn ghi vào ngày đã khóa (FT-072) kèm ma trận kiểm thử. Complexity 3: 決裁 hai cấp với ba người khác nhau (cần SETTLEMENT-MGR thứ hai), ngưỡng cấu hình có phiên bản và ngày hiệu lực, cấp 2 khi lớn hơn hẳn ngưỡng, dòng đảo và dòng điều chỉnh, không dùng chữ 承認/許可.","scopeSignature":["multi-component","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Điều chỉnh sau chốt — lập yêu cầu, 決裁 hai cấp, ngưỡng cấu hình có phiên bản","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":["KH tự chạy UAT; BrSE chỉ chuẩn bị kịch bản, tiếp nhận và phân loại phản hồi"],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful","operational-safety"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":10,"finalScope":5,"functionRef":"brse-uat-tasks.json#E11-U01","gaps":["Tỷ lệ bậc và tiêu chí bậc chưa có test vector Phụ lục C (Q-C7)"],"initialComplexity":3,"initialSWP":10,"initialScope":5,"issueRef":"brse-uat-tasks.json#E11-U01","issueType":"task","labels":["area:kanno","disc:brse","kanno","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: 2 màn (SCR-080, SCR-107) cùng 8 năng lực xuyên màn (engine, lược đồ run, compute/discard, publish, dòng chênh lệch kỳ sau, test vector, phiên bản biểu suất, job cuối kỳ) tạo thành một luồng hoàn chỉnh nên S5. Complexity: người trong vòng lặp (công bố ≠ tính, không tự công bố), run bất biến và có trạng thái nháp/công bố, công thức 完納奨励金 còn MOCK chờ KH, nên C3; không có bằng chứng đủ cho C5.","scopeSignature":["multi-component","cross-layer"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: 完納奨励金 — engine tính, run → công bố, chênh lệch kỳ sau (ràng buộc đặc thù)","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":["Nội dung 完納奨励金 thuộc E11, không tính vào UAT này"],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful","operational-safety"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":4,"finalScope":2,"functionRef":"brse-uat-tasks.json#E12-U01","gaps":[],"initialComplexity":3,"initialSWP":4,"initialScope":2,"issueRef":"brse-uat-tasks.json#E12-U01","issueType":"task","labels":["area:quy-tac","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: 2 màn (SCR-090, SCR-091) và 1 năng lực xuyên màn (quy trình phiên bản theo rule_kind), cùng một luồng nên S2. Complexity: người lập ≠ người quyết, 否決 bắt buộc có ý kiến, step-up mỗi lần quyết định (TOTP MOCK), hiệu lực từ ngày sau, mỗi ngày một bản 可決, kèm bẫy 許可 ≠ 承認 về đặt tên, nên C3.","scopeSignature":["multi-component"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Quy tắc và biểu suất (業務規程) — quy trình phiên bản: nháp, trình, 決裁, ngày hiệu lực, rollback","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":["Định dạng file kế toán (A17) và SFTP/ACK (A19) chờ KH xác nhận nhưng không đẩy độ khó lên mức cao hơn"],"calibration":{"approvedComplexity":3,"approvedScope":8,"complexityBandDelta":0,"isRepresentative":true,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":["maximum"],"status":"approved"},"complexitySignature":["stateful","external-integration"],"confidence":"medium","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":16,"finalScope":8,"functionRef":"brse-uat-tasks.json#E13-U01","gaps":["Cột báo cáo là đề xuất (A18, MOCK)"],"initialComplexity":3,"initialSWP":16,"initialScope":8,"issueRef":"brse-uat-tasks.json#E13-U01","issueType":"task","labels":["area:report","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: 12 màn báo cáo (SCR-100..112, trừ 107) và 3 năng lực xuyên màn (khung dùng chung, xuất kế toán IF-ACC-01 qua SFTP/ACK, job nền), ma trận quyền theo báo cáo nên S8. Complexity: nhiều bẫy nghiệp vụ (相対 trước せり, 許可/承認 tách trục, bốn vai trò, ngày ghi sổ so với ngày giao dịch), quyền theo cột/nhánh, SFTP thử lại ≤ 3 và chống gửi trùng, cột báo cáo còn MOCK A18, nên C3; các màn đều chỉ đọc nên không lên C5.","scopeSignature":["multi-component","cross-layer","cross-system","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Báo cáo \u0026 xuất dữ liệu — khung báo cáo dùng chung, 12 định nghĩa báo cáo (trừ RPT-07), xuất kế toán IF-ACC-01","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":[],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":2,"finalSWP":8,"finalScope":5,"functionRef":"brse-uat-tasks.json#E14-U01","gaps":[],"initialComplexity":2,"initialSWP":8,"initialScope":5,"issueRef":"brse-uat-tasks.json#E14-U01","issueType":"task","labels":["area:audit","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: UAT 2 màn chỉ đọc (SCR-120, SCR-121) cộng 4 năng lực xuyên màn (chuẩn ghi audit, phân vùng 7 năm, kiểm phủ/backfill, metadata tệp đính kèm) thành một luồng hoàn chỉnh nên chọn 5. Complexity: màn chỉ trình bày, nhưng cần giữ đúng nhãn 許可/承認/決裁, bẫy 相対/せり, snapshot điều khoản thanh toán, audit cho thao tác bị chặn, rule_version_id 完納奨励金 (do E11 ghi) và nguyên tắc con người trong vòng lặp nên chọn 2.","scopeSignature":["multi-component","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Audit \u0026 truy vết (chuẩn ghi, phân vùng 7 năm, SCR-120 tra cứu, SCR-121 chi tiết)","url":null,"workType":"test-design"},{"activityType":"unit-test","assumptions":["Phần gửi email SES có thể được KH kiểm qua môi trường thử, chưa rõ chi tiết"],"calibration":{"approvedComplexity":null,"approvedScope":null,"complexityBandDelta":0,"isRepresentative":false,"issueSpecific":false,"matchedRuleId":null,"saturated":false,"scopeBandDelta":0,"selectionReasons":[],"status":"unchanged"},"complexitySignature":["stateful","external-integration"],"confidence":"high","evidenceStatus":"EXTRACTED","existingEstimate":null,"finalComplexity":3,"finalSWP":10,"finalScope":5,"functionRef":"brse-uat-tasks.json#E15-U01","gaps":[],"initialComplexity":3,"initialSWP":10,"initialScope":5,"issueRef":"brse-uat-tasks.json#E15-U01","issueType":"task","labels":["area:notify","disc:brse","uat"],"milestones":[],"parentRef":null,"period":null,"primaryDiscipline":"QA","project":"product-a-lab5","provenance":{"detailStatus":"full","fields":["body","labels","title"],"notes":[],"retrievedVia":"file"},"rationale":"Scope: UAT 3 màn (SCR-130/131/132) cộng 4 năng lực xuyên màn (outbox, worker email SES, nguồn sự kiện nền, ops_alerts) tạo thành một workflow thông báo hoàn chỉnh nên chọn 5. Complexity: kịch bản bất đồng bộ (thử lại 1+3, dead, cảnh báo), cấu hình có phiên bản bất biến, Critical gửi trong 5 phút, phân quyền theo 4 vai trò/2 cấp (Q-C5), 許可/承認 đúng trục theo bên, nguyên tắc hệ thống chỉ nhắc nên cần hướng dẫn KH nhiều và kiểm chứng cẩn thận nên chọn 3.","scopeSignature":["multi-component","cross-layer","qa-matrix"],"sourceType":"file","splitReason":null,"splitRecommended":false,"sprints":[],"state":"open","status":null,"supportingEvidence":[],"title":"[BrSE] Hỗ trợ UAT: Thông báo — hộp thư in-app, email bất đồng bộ, cấu hình có phiên bản, log gửi, cảnh báo vận hành","url":null,"workType":"test-design"}],"parents":[],"representatives":[{"issueRef":"brse-uat-tasks.json#E04-U01","selectionReasons":["minimum"],"sourceType":"file"},{"issueRef":"brse-uat-tasks.json#E05-U01","selectionReasons":["lower-median"],"sourceType":"file"},{"issueRef":"brse-uat-tasks.json#E13-U01","selectionReasons":["maximum"],"sourceType":"file"},{"issueRef":"brse-uat-tasks.json#E02-U01","selectionReasons":["outlier"],"sourceType":"file"},{"issueRef":"brse-uat-tasks.json#E03-U01","selectionReasons":["lowest-confidence"],"sourceType":"file"}],"run":{"assessors":{"primary":{"aiModel":"sonnet","mode":"worker"},"witness":null},"calibrationStatus":"accepted","generatedAt":"2026-10-20T00:00:00Z","period":null,"processingLevel":"medium","project":"product-a-lab5","selection":{"excluded":{},"existingEstimateCheck":"unavailable","filters":{"labels":[],"milestones":[],"sprints":[]},"includeClosed":false,"reestimateExisting":false,"statusRule":"issue-state"},"sourceFamily":"file","sourceLabel":"Task BrSE hỗ trợ UAT (tệp tham chiếu brse-uat-tasks.json, 14 task, mỗi epic nghiệp vụ một task)","sourceUrl":null},"schemaVersion":"2.0","scoringModel":"standard-work-point","scoringModelVersion":"swp-matrix-v2"}</script>
+<script>
+(()=>{'use strict';
+const body=document.body;
+const rate=document.getElementById('rate');
+const uSwp=document.getElementById('u-swp'),uH=document.getElementById('u-h');
+const vals=[...document.querySelectorAll('.v[data-swp]')];
+function fmtHours(n){const h=n*parseFloat(rate.value||'0');const s=h>=100?Math.round(h):Math.round(h*10)/10;return s+'h';}
+function renderUnits(){const hours=body.classList.contains('hours');
+for(const el of vals){const n=parseFloat(el.getAttribute('data-swp'));el.textContent=hours?fmtHours(n):(n+' SWP');}
+uSwp.setAttribute('aria-pressed',hours?'false':'true');uH.setAttribute('aria-pressed',hours?'true':'false');
+try{localStorage.setItem('estimate-swp-unit',hours?'h':'swp');localStorage.setItem('estimate-swp-rate',rate.value);}catch(e){}}
+uSwp.addEventListener('click',()=>{body.classList.remove('hours');renderUnits();});
+uH.addEventListener('click',()=>{body.classList.add('hours');renderUnits();});
+rate.addEventListener('input',renderUnits);
+try{const r=localStorage.getItem('estimate-swp-rate');if(r&&parseFloat(r)>0)rate.value=r;
+if(localStorage.getItem('estimate-swp-unit')==='h')body.classList.add('hours');}catch(e){}
+renderUnits();
+const bodies=[...document.querySelectorAll('tbody[data-rows]')];
+const allRows=bodies.flatMap(b=>[...b.querySelectorAll('tr[data-search]')]);
+const search=document.getElementById('search'),discipline=document.getElementById('discipline'),workType=document.getElementById('work-type'),confidence=document.getElementById('confidence'),calibration=document.getElementById('calibration');
+function filterRows(){const query=search.value.trim().toLocaleLowerCase();
+for(const row of allRows){row.hidden=!!((query&&!row.dataset.search.includes(query))||(discipline.value&&row.dataset.discipline!==discipline.value)||(workType.value&&row.dataset.workType!==workType.value)||(confidence.value&&row.dataset.confidence!==confidence.value)||(calibration.value&&row.dataset.calibration!==calibration.value));}
+const active=query||discipline.value||workType.value||confidence.value||calibration.value;
+for(const group of document.querySelectorAll('details.group')){if(active&&group.querySelector('tbody tr:not([hidden])'))group.open=true;}}
+search.addEventListener('input',filterRows);
+for(const control of [discipline,workType,confidence,calibration])control.addEventListener('change',filterRows);
+for(const button of document.querySelectorAll('button[data-sort]'))button.addEventListener('click',()=>{
+const tbody=button.closest('table').querySelector('tbody[data-rows]');
+const rows=[...tbody.querySelectorAll('tr[data-search]')];
+const field=button.dataset.sort;const ascending=button.dataset.dir!=='asc';
+button.dataset.dir=ascending?'asc':'desc';const direction=ascending?1:-1;
+rows.sort((a,b)=>(Number(a.dataset[field])-Number(b.dataset[field]))*direction||a.dataset.search.localeCompare(b.dataset.search));
+for(const row of rows)tbody.appendChild(row);});
+})();
+</script></main></body></html>

@@ -14,7 +14,13 @@
 - Worker được dặn thêm: đây là việc review tài liệu (`workType: documentation`), ngành lấy theo tính năng có spec được review, độ phức tạp theo trạng thái spec LAB-4 (đã hiện thực < một phần < chỉ có thiết kế) và các bẫy nghiệp vụ chạm tới.
 - Kết quả: **638 SWP**, trung vị 5. Phân bố: 3 SWP: 16 · 4: 8 · 5: 28 · 6: 22 · 8: 10 · 10: 19 · 16: 1. Không có dòng sai hợp đồng; hiệu chỉnh `accepted`.
 - 15 issue trước đây là việc lá được tách phần việc hiện thực thành sub-issue riêng khi thêm `[BrSE]`; sub-issue tách ra giữ nguyên SWP đã chấm ở lượt đầu, không chấm lại.
-- **Tổng hai lượt: 420 việc lá, 2228 SWP** (1590 việc dev/QA/PM + 638 BrSE).
+
+**Lượt chấm thứ ba — task BrSE hỗ trợ UAT:** [reports/swp-estimate-report-uat.html](reports/swp-estimate-report-uat.html)
+
+- Thêm sau khi review: mỗi epic nghiệp vụ (E02–E15) có một issue `[BrSE] Hỗ trợ UAT` (14 task, khóa `Exx-U01`, nhãn `uat`): soạn kịch bản UAT tiếng Nhật, hướng dẫn KH, tiếp nhận, dịch và phân loại phản hồi, xác nhận sau khi sửa. KH tự chạy UAT; E01 và E16 không có task vì KH không UAT trực tiếp.
+- Cùng skill, level `medium`, `--no-push-kpi`, nguồn là tệp tham chiếu. Worker được dặn: ngành QA, `workType: test-design`, phạm vi theo số màn và năng lực của epic, độ phức tạp theo bẫy nghiệp vụ và kịch bản nhiều vai trò.
+- Kết quả: **118 SWP**, từ 4 (E04, E12) tới 16 (E02, E13). Không có dòng sai hợp đồng; hiệu chỉnh `accepted`.
+- **Tổng ba lượt: 434 việc lá, 2346 SWP** (1590 việc dev/QA/PM + 638 BrSE review spec + 118 BrSE hỗ trợ UAT).
 
 ## 2. Issue mẫu skill chọn để kiểm
 
@@ -39,6 +45,18 @@ Kết quả: **giữ nguyên cả 5**, nên không có quy tắc hiệu chỉnh 
 | #540 hồi quy QAX (lớn nhất) | S8 × C3 → **16** | Giữ **16** | Soát kịch bản hồi quy nhiều luồng, chạm cả bốn bẫy và công thức thưởng |
 | #423 RDS + migration (ngoại lệ) | S5 × C3 → **10** | Giữ **10** | Chuyển migration khỏi Supabase cần soát kỹ từng phụ thuộc |
 | #425 lớp truy cập DB (độ tin cậy thấp nhất) | S5 × C3 → **10** | Giữ **10** | Spec còn thiếu phần chuyển lớp service, playbook cho khoảng 250 chỗ gọi |
+
+Giữ nguyên cả 5, không có hiệu chỉnh lan truyền.
+
+**Lượt UAT — 5 task mẫu**, duyệt cùng cách hai vòng:
+
+| Task | Skill chấm (Scope × Complexity → SWP) | Bạn chốt | Lý do |
+|---|---|---|---|
+| #543 master data (nhỏ nhất) | S3 × C1 → **4** | Giữ **4** | 3 màn master đơn giản |
+| #544 lô hàng (dưới trung vị) | S5 × C2 → **8** | Giữ **8** | 4 màn thành một luồng, có bẫy người nhập kết luận 目利き |
+| #552 báo cáo (lớn nhất) | S8 × C3 → **16** | Giữ **16** | 12 báo cáo, ma trận quyền và đối chiếu số liệu với KH |
+| #541 danh tính (ngoại lệ) | S8 × C3 → **16** | Giữ **16** | Kịch bản nhiều vai trò, step-up TOTP |
+| #542 bên tham gia (độ tin cậy thấp nhất) | S3 × C3 → **6** | Giữ **6** | Hai trục 許可/承認 và ranh giới hai cấp là giả định cần KH xác nhận |
 
 Giữ nguyên cả 5, không có hiệu chỉnh lan truyền.
 
@@ -102,42 +120,42 @@ Mỗi nhóm chỉ có 2 mẫu nên hệ số là xấp xỉ; Bugfix và Integrat
 | #425 | 10 | 14 | Khoảng 2,3 ngày |
 | **Cộng** | **44** | **58** | 58 / 44 = 1,32 → chốt **1,3** |
 
-Hệ số này thấp hơn của việc dev vì không có code, unit test hay code review; tôi đã duyệt hệ số trước khi áp cho 104 task.
+Hệ số này thấp hơn của việc dev vì không có code, unit test hay code review; tôi đã duyệt hệ số trước khi áp cho 104 task. 14 task hỗ trợ UAT cũng do BrSE làm nên dùng chung hệ số 1,3 (118 SWP → 154 giờ).
 
-**Áp dụng nhất quán:** `tools/plan-sprints.py` đọc kết quả SWP đã hiệu chỉnh của hai lượt chấm, nhân đúng hệ số (theo loại việc với việc dev/QA/PM, 1,3 với task BrSE) cho mọi việc lá, làm tròn, cộng lên cha và epic, ghi vào `plans/project-values.json`. Sau đó `tools/github-backlog-sync.py` ghi giá trị lên trường **Giờ ước lượng** của Project (cùng với Point). Tổng **4088,5 giờ** = 3253,5 giờ việc dev/QA/PM + 835 giờ BrSE.
+**Áp dụng nhất quán:** `tools/plan-sprints.py` đọc kết quả SWP đã hiệu chỉnh của hai lượt chấm, nhân đúng hệ số (theo loại việc với việc dev/QA/PM, 1,3 với task BrSE) cho mọi việc lá, làm tròn, cộng lên cha và epic, ghi vào `plans/project-values.json`. Sau đó `tools/github-backlog-sync.py` ghi giá trị lên trường **Giờ ước lượng** của Project (cùng với Point). Tổng **4242,5 giờ** = 3253,5 giờ việc dev/QA/PM + 835 giờ BrSE review spec + 154 giờ BrSE hỗ trợ UAT.
 
 ## 4. Tổng theo epic
 
-SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project. "Số issue" là mọi issue của epic, gồm cả issue làm rõ; "Việc lá" là phần đã chấm SWP, gồm cả task `[BrSE]` (cộng SWP chỉ trên việc lá để không đếm trùng với cha).
+SWP và giờ lấy từ trường Point và Giờ ước lượng trên Project. "Số issue" là mọi issue của epic, gồm cả issue làm rõ; "Số issue" gồm cả issue hỗ trợ UAT của epic; "Việc lá" là phần đã chấm SWP, gồm cả task `[BrSE]` và hỗ trợ UAT (cộng SWP chỉ trên việc lá để không đếm trùng với cha).
 
-| Epic | Số issue | Việc lá | SWP dev/QA/PM | SWP BrSE | Tổng SWP | Tổng giờ | Ghi chú |
+| Epic | Số issue | Việc lá | SWP dev/QA/PM | SWP BrSE (review + UAT) | Tổng SWP | Tổng giờ | Ghi chú |
 |---|---:|---:|---:|---:|---:|---:|---|
 | #1 Nền tảng và hạ tầng bản thật (AWS, khung app, job, hàng đợi, tệp, CI/CD) | 14 | 48 | 205 | 104 | 309 | 590,5 | Nền tảng chuyển Supabase sang AWS (S09, S10, D05); 2 issue làm rõ. Đối ứng LAB-1: phần hạ tầng của NFR |
-| #50 Danh tính và phân quyền nội bộ | 10 | 35 | 128 | 51 | 179 | 329,5 | Đối ứng FN-01; thêm TOTP, step-up 6 action (S12) |
-| #85 Bên tham gia và hiệu lực 許可/承認 | 5 | 17 | 45 | 24 | 69 | 120 | Đối ứng FN-02 |
-| #103 Master data: lịch chợ, mặt hàng, điều khoản thanh toán | 5 | 13 | 36 | 15 | 51 | 95 | Đối ứng FN-15 |
-| #116 Lô hàng và đánh giá | 6 | 20 | 74 | 24 | 98 | 183 | Đối ứng FN-03 |
-| #137 相対取引 | 7 | 28 | 105 | 36 | 141 | 254,5 | Đối ứng FN-04; màn được đầu tư nhất của luồng chính |
-| #166 せり | 4 | 15 | 73 | 21 | 94 | 171,5 | Đối ứng FN-05; import hàng loạt là màn mới |
-| #182 Giao hàng | 5 | 19 | 74 | 18 | 92 | 169,5 | Đối ứng FN-06; tệp đính kèm tách sang E01 (D08) |
-| #202 Đối chiếu, chốt kỳ, tranh chấp, điều khoản thanh toán | 8 | 29 | 126 | 37 | 163 | 298 | Đối ứng FN-07; gồm tranh chấp 紛争 |
-| #232 Đính chính sau chốt | 6 | 20 | 101 | 27 | 128 | 235,5 | Đối ứng FN-08; có việc khó nhất backlog (#239, 15 SWP) |
-| #253 完納奨励金 | 14 | 36 | 95 | 46 | 141 | 255,5 | **Ràng buộc đặc thù 完納奨励金**, đối ứng FN-09; 4 issue làm rõ, 26/26 việc lá mang nhãn `kanno` |
-| #289 Quy tắc và biểu suất | 5 | 13 | 57 | 22 | 79 | 141,5 | Đối ứng FN-10; khung chọn phiên bản dùng chung (D11) |
-| #303 Báo cáo và xuất dữ liệu | 17 | 42 | 127 | 69 | 196 | 343,5 | Đối ứng FN-11; 12 báo cáo trên một khung cấu hình (RPT-07 nằm ở E11) |
-| #336 Audit và truy vết | 9 | 24 | 82 | 30 | 112 | 210,5 | Đối ứng FN-12; audit ghi trong giao dịch (S24) |
-| #360 Thông báo | 9 | 26 | 88 | 47 | 135 | 245,5 | Đối ứng FN-13; bốn job quét thuộc E15 (D03) |
+| #50 Danh tính và phân quyền nội bộ | 11 | 36 | 128 | 67 | 195 | 350,5 | Đối ứng FN-01; thêm TOTP, step-up 6 action (S12) |
+| #85 Bên tham gia và hiệu lực 許可/承認 | 6 | 18 | 45 | 30 | 75 | 128 | Đối ứng FN-02 |
+| #103 Master data: lịch chợ, mặt hàng, điều khoản thanh toán | 6 | 14 | 36 | 19 | 55 | 100 | Đối ứng FN-15 |
+| #116 Lô hàng và đánh giá | 7 | 21 | 74 | 32 | 106 | 193,5 | Đối ứng FN-03 |
+| #137 相対取引 | 8 | 29 | 105 | 46 | 151 | 267,5 | Đối ứng FN-04; màn được đầu tư nhất của luồng chính |
+| #166 せり | 5 | 16 | 73 | 26 | 99 | 178 | Đối ứng FN-05; import hàng loạt là màn mới |
+| #182 Giao hàng | 6 | 20 | 74 | 23 | 97 | 176 | Đối ứng FN-06; tệp đính kèm tách sang E01 (D08) |
+| #202 Đối chiếu, chốt kỳ, tranh chấp, điều khoản thanh toán | 9 | 30 | 126 | 47 | 173 | 311 | Đối ứng FN-07; gồm tranh chấp 紛争 |
+| #232 Đính chính sau chốt | 7 | 21 | 101 | 33 | 134 | 243,5 | Đối ứng FN-08; có việc khó nhất backlog (#239, 15 SWP) |
+| #253 完納奨励金 | 15 | 37 | 95 | 56 | 151 | 268,5 | **Ràng buộc đặc thù 完納奨励金**, đối ứng FN-09; 4 issue làm rõ, 26/26 việc lá mang nhãn `kanno` |
+| #289 Quy tắc và biểu suất | 6 | 14 | 57 | 26 | 83 | 146,5 | Đối ứng FN-10; khung chọn phiên bản dùng chung (D11) |
+| #303 Báo cáo và xuất dữ liệu | 18 | 43 | 127 | 85 | 212 | 364,5 | Đối ứng FN-11; 12 báo cáo trên một khung cấu hình (RPT-07 nằm ở E11) |
+| #336 Audit và truy vết | 10 | 25 | 82 | 38 | 120 | 221 | Đối ứng FN-12; audit ghi trong giao dịch (S24) |
+| #360 Thông báo | 10 | 27 | 88 | 57 | 145 | 258,5 | Đối ứng FN-13; bốn job quét thuộc E15 (D03) |
 | #387 Phi chức năng và hồi quy | 10 | 35 | 174 | 67 | 241 | 445 | Đối ứng NFR + QAX; hồi quy cuối, 3 issue làm rõ |
-| **Tổng** | **134** | **420** | **1590** | **638** | **2228** | **4088,5** | 4088,5 giờ ≈ 511,1 ngày công (8 giờ/ngày); trong đó BrSE 835 giờ |
+| **Tổng** | **148** | **434** | **1590** | **756** | **2346** | **4242,5** | 4242,5 giờ ≈ 530,3 ngày công (8 giờ/ngày); trong đó BrSE 989 giờ (review 835 + UAT 154) |
 
-**Ràng buộc đặc thù 完納奨励金:** toàn bộ nghiệp vụ nằm ở #253 (95 SWP, 196 giờ việc dev/QA/PM; cộng 10 task BrSE thì 141 SWP, 255,5 giờ). Tính cả các mảnh gắn nhãn `kanno` ở ngoài E11 (#320, #415) thì có 29 việc lá dev/QA/PM, 114 SWP, 233,0 giờ; cộng 11 task BrSE mang nhãn `kanno` thì 40 việc lá, 166 SWP, 300,5 giờ, lọc được bằng nhãn để so với nhóm FN-09 của LAB-1. Tỷ lệ bậc vẫn là MOCK đến khi KH cấp test vector (#285).
+**Ràng buộc đặc thù 完納奨励金:** toàn bộ nghiệp vụ nằm ở #253 (95 SWP, 196 giờ việc dev/QA/PM; cộng 10 task BrSE review spec và task hỗ trợ UAT thì 151 SWP, 268,5 giờ). Tính cả các mảnh gắn nhãn `kanno` ở ngoài E11 (#320, #415) thì có 29 việc lá dev/QA/PM, 114 SWP, 233,0 giờ; cộng 12 task BrSE mang nhãn `kanno` (11 review spec, 1 hỗ trợ UAT) thì 41 việc lá, 176 SWP, 313,5 giờ, lọc được bằng nhãn để so với nhóm FN-09 của LAB-1. Tỷ lệ bậc vẫn là MOCK đến khi KH cấp test vector (#285).
 
 ## 5. So với estimate LAB-1
 
 - **LAB-1:** MD của bảng task **trước buffer 30%**: 627 MD (gồm FN-14 51 MD, DOC 75 MD, Design UI/UX 56 MD, QA chạy test 134 MD). Sau buffer, đội 968 + BrSE 290 + PSM 87 = **1345 MD** (kịch bản AI 20% + responsive 15%).
-- **LAB-5:** MD = giờ / 8 (8 giờ một ngày công), chưa buffer, chưa PSM, **chỉ tính việc dev/QA/PM** để so cùng đáy với bảng task LAB-1: 3253,5 / 8 = **406,7 MD**. Task BrSE review spec (835 giờ ≈ 104,4 MD) so riêng ở mục "BrSE" bên dưới.
+- **LAB-5:** MD = giờ / 8 (8 giờ một ngày công), chưa buffer, chưa PSM, **chỉ tính việc dev/QA/PM** để so cùng đáy với bảng task LAB-1: 3253,5 / 8 = **406,7 MD**. Task BrSE review spec và hỗ trợ UAT (989 giờ ≈ 123,6 MD) so riêng ở mục "BrSE" bên dưới.
 - Nên so 627 với 406,7. Con số 1345 MD là sau buffer và gánh BrSE/PSM, không cùng đáy với bảng task.
-- **LAB-5 sau chặn mức giảm 30% theo epic:** **453,5 MD** (3628,1 giờ). Cộng task BrSE (104,4 MD) thì estimate chốt là **557,9 MD** (4463,1 giờ). Cách tính chặn ở mục "Chặn mức giảm tối đa 30% theo epic" bên dưới. Bảng so sánh ngay sau đây giữ số gốc (SWP × hệ số) để thấy lệch thật trước khi chặn.
+- **LAB-5 sau chặn mức giảm 30% theo epic:** **453,5 MD** (3628,1 giờ). Cộng task BrSE (123,6 MD) thì estimate chốt là **577,1 MD** (4617,1 giờ). Cách tính chặn ở mục "Chặn mức giảm tối đa 30% theo epic" bên dưới. Bảng so sánh ngay sau đây giữ số gốc (SWP × hệ số) để thấy lệch thật trước khi chặn.
 
 | Phần (chức năng/epic) | LAB-1 (MD) | LAB-5 (MD) | Chênh | Vì sao |
 |---|---:|---:|---:|---|
@@ -195,10 +213,10 @@ Các epic gần ngưỡng nhưng không bị chặn: #137 相対取引 -28,1%, #
 
 | | LAB-1 | LAB-5 |
 |---|---:|---:|
-| BrSE trước buffer | ≈ 223,1 MD (290 / 1,3) | 104,4 MD (835 giờ, 104 task `[BrSE]`) |
-| BrSE sau buffer 30% | 290 MD | 135,7 MD |
+| BrSE trước buffer | ≈ 223,1 MD (290 / 1,3) | 123,6 MD (989 giờ: 104 task review spec 835 giờ + 14 task hỗ trợ UAT 154 giờ) |
+| BrSE sau buffer 30% | 290 MD | 160,7 MD |
 
-LAB-5 thấp hơn vì task `[BrSE]` chỉ là review và điều chỉnh spec LAB-4 trước khi dev, một lần cho mỗi issue. BrSE của LAB-1 gánh cả việc cầu nối suốt dự án: họp với KH, dịch tài liệu và câu hỏi, trả lời Q&A, hỗ trợ UAT. Các việc đó không nằm trong backlog LAB-5 (một phần do PM làm qua 30 issue làm rõ). Chặn mức giảm 30% không áp cho BrSE vì bảng task LAB-1 không có dòng BrSE để so theo epic.
+LAB-5 thấp hơn vì chỉ tính hai loại việc BrSE có sản phẩm rõ: review, điều chỉnh spec LAB-4 trước khi dev (một lần mỗi issue) và hỗ trợ UAT (một lần mỗi epic nghiệp vụ). BrSE của LAB-1 gánh cả việc cầu nối suốt dự án: họp định kỳ với KH, dịch tài liệu và câu hỏi, trả lời Q&A. Các việc đó không nằm trong backlog LAB-5 (một phần do PM làm qua 30 issue làm rõ). Chặn mức giảm 30% không áp cho BrSE vì bảng task LAB-1 không có dòng BrSE để so theo epic.
 
 ### Effort theo vai trò, sau chặn 30% và sau buffer 30%
 
@@ -206,14 +224,14 @@ Buffer 30% là tỷ lệ đã chốt ở bảng task LAB-1. Buffer chỉ cộng 
 
 | Vai trò | Việc lá | SWP | Giờ gốc | Giờ sau chặn 30% | Giờ sau chặn + buffer 30% | MD sau chặn + buffer (8h) | Tỷ lệ |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| BE | 145 | 792 | 1636,0 | 1850,7 | 2405,9 | 300,7 | 41,5% |
-| FE | 69 | 296 | 556,5 | 669,3 | 870,0 | 108,8 | 15,0% |
-| QA | 50 | 297 | 594,0 | 629,1 | 817,8 | 102,2 | 14,1% |
-| INFRA | 22 | 126 | 302,5 | 302,8 | 393,6 | 49,2 | 6,8% |
-| PM (issue làm rõ) | 30 | 79 | 164,5 | 176,3 | 229,2 | 28,7 | 4,0% |
-| BrSE (review spec) | 104 | 638 | 835,0 | 835,0 | 1085,5 | 135,7 | 18,7% |
-| **Tổng** | **420** | **2228** | **4088,5** | **4463,1** | **5802,0** | **725,3** | 100% |
+| BE | 145 | 792 | 1636,0 | 1850,7 | 2405,9 | 300,7 | 40,1% |
+| FE | 69 | 296 | 556,5 | 669,3 | 870,0 | 108,8 | 14,5% |
+| QA | 50 | 297 | 594,0 | 629,1 | 817,8 | 102,2 | 13,6% |
+| INFRA | 22 | 126 | 302,5 | 302,8 | 393,6 | 49,2 | 6,6% |
+| PM (issue làm rõ) | 30 | 79 | 164,5 | 176,3 | 229,2 | 28,7 | 3,8% |
+| BrSE (review spec + hỗ trợ UAT) | 118 | 756 | 989,0 | 989,0 | 1285,7 | 160,7 | 21,4% |
+| **Tổng** | **434** | **2346** | **4242,5** | **4617,1** | **6002,2** | **750,3** | 100% |
 
 - BE + FE + QA sau chặn và buffer: 4093,7 giờ ≈ 511,7 MD.
 - Cùng buffer 30%, phần so được của LAB-1 là 501 × 1,3 = 651,3 MD, LAB-5 (không tính BrSE) là 589,6 MD (thấp hơn khoảng 62 MD, cùng lý do ở trên).
-- Đã gồm task BrSE review spec; chưa gồm PSM và phần BrSE ngoài review spec (LAB-1: BrSE 290 + PSM 87 MD sau buffer).
+- Đã gồm task BrSE review spec và hỗ trợ UAT; chưa gồm PSM và phần BrSE khác (họp định kỳ, dịch, Q&A) (LAB-1: BrSE 290 + PSM 87 MD sau buffer).

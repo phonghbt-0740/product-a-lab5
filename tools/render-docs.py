@@ -20,7 +20,7 @@ def to_number(match):
 
 
 for src in sorted(glob.glob(os.path.join(ROOT, "plans", "docs-src", "*.md"))):
-    text = re.sub(r"\[\[([A-Z]\d\d(?:-[IC]\d\d(?:-S\d+)?)?)\]\]", to_number, open(src).read())
+    text = re.sub(r"\[\[([A-Z]\d\d(?:-[ICU]\d\d(?:-S\d+)?)?)\]\]", to_number, open(src).read())
     open(os.path.join(ROOT, os.path.basename(src)), "w").write(text)
     print(f"xuất {os.path.basename(src)}")
 

@@ -9,8 +9,10 @@ và task BrSE review spec (plans/swp-brse/calibrated.json) — backlog YAML (th�
 
 Xếp hai lượt:
   1. Việc dev/QA/PM theo thứ tự backlog, sprint sớm nhất còn chỗ (như trước).
-  2. Task BrSE (mã `…-S0`): hạn = sprint ngay trước sprint dev đầu tiên của issue (issue bắt đầu Sprint 1 thì Sprint 1).
-     Xếp vào sprint muộn nhất ≤ hạn còn chỗ; số BrSE tăng dần (BrSE1, BrSE2, …) tới khi mọi task kịp hạn.
+  2. Task BrSE review spec (mã `…-S0`): hạn = sprint ngay trước sprint dev đầu tiên của issue (issue bắt đầu Sprint 1
+     thì Sprint 1). Xếp vào sprint muộn nhất ≤ hạn còn chỗ; số BrSE tăng dần (BrSE1, BrSE2, …) tới khi mọi task kịp hạn.
+  3. Task BrSE hỗ trợ UAT (mã `Exx-U01`, một task mỗi epic nghiệp vụ): sprint ngay sau sprint có việc dev/QA cuối của epic
+     (tối đa Sprint 12), xếp vào BrSE đã có, lấp người đầu trước; không còn chỗ tới Sprint 12 thì dồn vào Sprint 12 và báo.
 """
 import glob, json, os, sys
 from collections import defaultdict
@@ -40,9 +42,10 @@ def load_rows(state):
     """Dòng SWP đã chốt cho mọi việc lá, theo mã backlog."""
     main = {int(r["issueRef"].split("#")[1]): r for r in json.load(open(os.path.join(ROOT, "plans", "swp", "calibrated.json")))["issues"]}
     brse = {r["issueRef"].split("#")[1]: r for r in json.load(open(os.path.join(ROOT, "plans", "swp-brse", "calibrated.json")))["issues"]}
+    brse.update({r["issueRef"].split("#")[1]: r for r in json.load(open(os.path.join(ROOT, "plans", "swp-uat", "calibrated.json")))["issues"]})
 
     def row(key):
-        if key.endswith("-S0"):
+        if key.endswith("-S0") or key.endswith("-U01"):
             return brse[key]
         rec = state.get(key)
         if rec and rec["number"] in main:
@@ -85,7 +88,7 @@ def main():
     done_in = defaultdict(lambda: 1)       # theo issue cha: sprint muộn nhất của mọi phần không phải QA
     first_dev = {}                         # theo issue cha: sprint sớm nhất của việc dev/QA
     overflow = []
-    for key in (k for k in ordered if not k.endswith("-S0")):
+    for key in (k for k in ordered if not k.endswith("-S0") and not k.endswith("-U01")):
         row = row_of(key)
         hours = round(row["finalSWP"] * HOURS_PER_SWP[row["primaryDiscipline"]] * 2) / 2
         role = role_of(row)
@@ -130,6 +133,23 @@ def main():
         load[(person, s)] += hours
         values[key] = {"Point": row_of(key)["finalSWP"], "Giờ ước lượng": hours, "Phụ trách": person, "Sprint": f"Sprint {s}"}
 
+    # Lượt 3: task BrSE hỗ trợ UAT, cuốn chiếu theo epic
+    last_dev = defaultdict(int)
+    for key, v in values.items():
+        if not key.endswith("-S0"):
+            last_dev[key[:3]] = max(last_dev[key[:3]], int(v["Sprint"].split()[1]))
+    people = sorted({p for (p, _), h in load.items() if p.startswith("BrSE")}, key=lambda p: int(p[4:]))
+    uat_overflow = []
+    for key in (k for k in ordered if k.endswith("-U01")):
+        hours = round(row_of(key)["finalSWP"] * BRSE_HOURS_PER_SWP * 2) / 2
+        target = min(SPRINTS, last_dev[key[:3]] + 1)
+        spot = next(((s, p) for s in range(target, SPRINTS + 1) for p in people if load[(p, s)] + hours <= DEFAULT_CAPACITY), None)
+        if spot is None:
+            spot = (SPRINTS, min(people, key=lambda p: load[(p, SPRINTS)]))
+            uat_overflow.append(key)
+        load[spot[::-1]] += hours
+        values[key] = {"Point": row_of(key)["finalSWP"], "Giờ ước lượng": hours, "Phụ trách": spot[1], "Sprint": f"Sprint {spot[0]}"}
+
     # Cha (issue có sub, epic): Point và giờ = tổng con; không gán người/sprint
     for ek in EPIC_ORDER:
         epic_pt = epic_h = 0
@@ -149,7 +169,7 @@ def main():
     print("số BrSE:", n, "· giờ BrSE theo sprint:",
           {s: sum(h for (p, ss), h in load.items() if ss == s and p.startswith("BrSE")) for s in range(1, SPRINTS + 1)})
     print("giờ theo sprint:", {s: per_sprint[s] for s in sorted(per_sprint)})
-    print("việc bị dồn vì hết chỗ:", len(overflow), overflow[:10])
+    print("việc bị dồn vì hết chỗ:", len(overflow), overflow[:10], "· UAT dồn:", uat_overflow)
     print("tổng SWP", sum(values[e]["Point"] for e in EPIC_ORDER), "· tổng giờ", sum(values[e]["Giờ ước lượng"] for e in EPIC_ORDER))
 
 

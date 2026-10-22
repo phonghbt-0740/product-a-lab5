@@ -40,7 +40,7 @@ Khung thân issue: Mục tiêu · Phạm vi · Trạng thái ở LAB-4 · Nguồ
 - Trường khác trên Project: Status, Iteration, Phụ trách (người giả định theo vai trò), **Point** (SWP đã review), **Giờ ước lượng**.
 - **SWP của epic = tổng con**: chấm ở sub-issue và issue lá; issue cha cộng từ sub-issue; epic cộng từ issue. Epic không chấm riêng.
 - **Issue làm rõ** (30 cái): khóa dạng `Exx-Cnn`, nhãn `clarify`, tiêu đề `[Làm rõ]`, không có sub-issue. Mỗi cái nêu câu hỏi, các phương án, đề xuất, và issue nào bị chặn hoặc đổi estimate theo câu trả lời.
-- Nhãn: `epic` · `screen` · `capability` · `clarify` · `disc:be|fe|qa|infra|data|brse` · `lab4:da-hien-thuc|mot-phan|thiet-ke` · `kanno` (完納奨励金) · `area:<tên ngắn epic>`.
+- Nhãn: `epic` · `screen` · `capability` · `clarify` · `disc:be|fe|qa|infra|data|brse` · `uat` · `lab4:da-hien-thuc|mot-phan|thiet-ke` · `kanno` (完納奨励金) · `area:<tên ngắn epic>`.
 
 ### 1.4. Đặt khóa và tiêu đề
 
@@ -50,6 +50,7 @@ Khung thân issue: Mục tiêu · Phạm vi · Trạng thái ở LAB-4 · Nguồ
 | Issue | `Exx-Inn` | màn: bắt đầu bằng mã `SCR-xxx`; năng lực xuyên màn: tên năng lực |
 | Sub-issue | `Exx-Inn-Sn` | bắt đầu bằng `[BE]`, `[FE]`, `[QA]`, `[INFRA]` hoặc `[DATA]` |
 | Sub-issue BrSE | `Exx-Inn-S0` | `[BrSE] Review và điều chỉnh spec LAB-4: <tên issue cha>` |
+| Issue hỗ trợ UAT | `Exx-U01` | `[BrSE] Hỗ trợ UAT: <tên epic>` |
 | Issue làm rõ | `Exx-Cnn` | `[Làm rõ] …` |
 
 Khóa nằm ở dòng cuối thân issue ("Mã backlog"). Hai cặp issue làm rõ trùng nội dung đã gộp thành một, khóa bị gộp không dùng lại nên dãy `Cnn` có chỗ trống.
@@ -62,6 +63,8 @@ Spec đã làm xong ở LAB-4, nhưng trước khi dev bắt đầu một issue 
 - **Thời điểm:** ở sprint ngay trước sprint có việc dev đầu tiên của issue; issue có dev bắt đầu ngay Sprint 1 thì review ở đầu Sprint 1.
 - **Không thay issue làm rõ:** câu hỏi mới phát sinh khi review chuyển cho PM; BrSE không tự quyết thay KH.
 - **15 issue trước đây là việc lá** (một kỷ luật, không có sub-issue): khi thêm `[BrSE]` thì phần việc hiện thực được tách thành một sub-issue riêng `Exx-Inn-S1` (tiêu đề `[BE]/[FE]/[QA]/[DATA] Hiện thực: …`), giữ nguyên SWP đã chấm cho issue trước khi tách.
+
+**Hỗ trợ UAT:** mỗi epic nghiệp vụ (E02–E15) có thêm một issue `[BrSE] Hỗ trợ UAT` (khóa `Exx-U01`, nhãn `uat` và `disc:brse`, là việc lá nằm thẳng dưới epic): soạn kịch bản UAT tiếng Nhật cho các màn và năng lực của epic, hướng dẫn KH, tiếp nhận, dịch và phân loại phản hồi thành issue cho đội, xác nhận sau khi sửa, ghi biên bản. KH là người chạy UAT và quyết định đạt hay không. UAT cuốn chiếu: làm ở sprint ngay sau sprint có việc dev/QA cuối của epic (tối đa Sprint 12). E01 và E16 không có issue này vì KH không UAT trực tiếp.
 
 ## 2. Spec → issue
 
@@ -156,7 +159,7 @@ Tổng cộng 53 màn đều có issue (không màn nào bị bỏ). Số sub-is
 | `specs/08-traceability/traceability-matrix.md` | #387 | #412 | Dùng làm đầu vào bộ hồi quy; không có việc riêng |
 | `specs/09-verification/` (4 checklist đối chiếu RFP) | — | — | Bằng chứng đối chiếu của LAB-4, không phải việc làm |
 | `specs/README.md`, `PREMISE.md`, `AI-report.md`, `_templates/` | — | — | Tài liệu nộp và mẫu của LAB-4 |
-| FN-14 dịch vụ dự án: FT-160, FT-164–FT-167 (migration dữ liệu, cutover, UAT, đào tạo, hỗ trợ vận hành) | — | không có | Là hoạt động dự án, không phải phần mềm hay dữ liệu; LAB-1 estimate riêng (51 MD / 94 SP trước buffer), nên so estimate FN-14 sẽ không có issue đối ứng |
+| FN-14 dịch vụ dự án: FT-160, FT-164–FT-167 (migration dữ liệu, cutover, UAT, đào tạo, hỗ trợ vận hành) | — | chỉ phần BrSE hỗ trợ UAT: 14 issue `Exx-U01` | Là hoạt động dự án, không phải phần mềm hay dữ liệu; LAB-1 estimate riêng (51 MD / 94 SP trước buffer). Riêng việc BrSE hỗ trợ UAT đã thành issue (mục 1.5); KH chạy UAT, migration dữ liệu, cutover, đào tạo, hỗ trợ vận hành vẫn ngoài backlog |
 | 4 option FT-900..903 (遠隔取引, cổng 買出人, phân tích, gợi ý chất lượng bằng AI) | — | không có | Ngoài baseline (LAB-1 tính riêng 224 MD); option gợi ý chất lượng còn chạm bẫy "con người trong vòng lặp" nên không đưa vào |
 | Tài liệu thiết kế (LAB-4) và tài liệu bàn giao (LAB-1 nhóm DOC) | — | không có | Đã làm xong ở LAB-4; bản thật chỉ cập nhật tài liệu API trong DoD chung |
 

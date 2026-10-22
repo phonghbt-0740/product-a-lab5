@@ -19,16 +19,16 @@ Tổng SWP chỉ cộng trên việc lá (issue cha và epic đã bằng tổng 
 | Todo | 2 | 9 | #12 (test phân quyền chờ RLS), #83 (PM dồn sức cho #48) |
 | **Cộng** | **38** | **261** | Hoàn thành **211/261 = 81%**. Riêng việc dev/QA/PM: 76/116 = 66%; riêng review spec: 135/145 = 93% |
 
-**Toàn Project (540 mục sau Sprint 1):**
+**Toàn Project (554 mục sau Sprint 1):**
 
 | Trạng thái | Số mục (cả epic, issue, sub-issue) | Việc lá | SWP (việc lá) |
 |---|---:|---:|---:|
 | Done | 31 | 30 | 211 |
 | In Progress | 26 | 6 | 41 |
-| Todo | 483 | 384 | 1976 |
-| **Cộng** | **540** | **420** | **2228** |
+| Todo | 497 | 398 | 2094 |
+| **Cộng** | **554** | **434** | **2346** |
 
-Done có 31 mục vì ngoài 30 việc lá còn #13 (issue cha có đủ con đã xong). In Progress 26 mục gồm 6 việc lá, các issue cha đã có con bắt đầu và epic #1, #50. Tính theo SWP, dự án mới xong 211/2228 ≈ 9,5%.
+Done có 31 mục vì ngoài 30 việc lá còn #13 (issue cha có đủ con đã xong). In Progress 26 mục gồm 6 việc lá, các issue cha đã có con bắt đầu và epic #1, #50. Tính theo SWP, dự án mới xong 211/2346 ≈ 9,0%.
 
 ## 3. Burndown Sprint 1
 
@@ -68,7 +68,7 @@ xychart-beta
 | M1 | Nền tảng E01 xong | Cuối Sprint 4, 2026-11-27 | Việc lá cuối của #1 (giám sát, canary, TLS/KMS) nằm ở Sprint 4; lõi (migration, container, lịch job, worker) xong ở Sprint 2 (2026-10-30) |
 | M2 | Luồng 相対取引 end-to-end | Cuối Sprint 6, 2026-12-25 | Việc lá cuối của #137 ở Sprint 6; #85, #103, #116 xong trước đó |
 | M3 | 47/53 màn xong | Cuối Sprint 11, 2027-03-05 | 47 màn có mọi việc lá xong trước hoặc trong Sprint 11; 6 màn còn lại (#324, #347, #350, #374, #377, #380) rơi vào Sprint 12 |
-| M4 | Đủ 53 màn, hồi quy xong, sẵn sàng go-live | Cuối Sprint 12, 2027-03-19 | Hồi quy cuối (#412) và 6 màn còn lại cùng ở Sprint 12 |
+| M4 | Đủ 53 màn, hồi quy xong, UAT xong, sẵn sàng go-live | Cuối Sprint 12, 2027-03-19 | Hồi quy cuối (#412), 6 màn còn lại và UAT của ba epic cuối (#552, #553, #554) cùng ở Sprint 12. UAT các epic khác cuốn chiếu từ Sprint 5 (#541) tới Sprint 11 (#550) |
 
 Sprint 2 chạy 2026-10-19 → 2026-10-30; Sprint 3: 11-02 → 11-13.
 
@@ -84,3 +84,4 @@ Sprint 2 chạy 2026-10-19 → 2026-10-30; Sprint 3: 11-02 → 11-13.
 | 30 issue làm rõ đang chờ KH trả lời (79 SWP); chưa trả lời thì issue liên quan phải làm theo đề xuất | 30 issue `clarify`, ví dụ #83, #136, #334 | M2 (phần làm rõ ở E05, E06), M3, M4 | Gom câu hỏi theo epic, gửi theo lô; đặt hạn trả lời trước sprint có việc bị chặn; quá hạn thì lấy đề xuất trong issue làm giả định và ghi vào danh sách rủi ro | PM: lô đầu (9 issue làm rõ của Sprint 1–2) gửi 2026-10-23; các lô sau gửi đầu mỗi sprint |
 | Có thể hiểu sai yêu cầu ở 4 epic có công số giảm mạnh so với LAB-1 (đã chặn mức giảm 30% trong `estimate.md`) | #85, #116, #182, #303 | M2, M3 | Đối chiếu lại yêu cầu RFP của từng epic trước khi làm; phát sinh việc thì dùng phần dự phòng 374,6 giờ ở `estimate.md` §5 | PM + BE1: E03 và E05 đã vào Sprint 2 nên soát ngay, xong 2026-10-23; E08 xong trước Sprint 3 (2026-11-02); E13 xong trước Sprint 5 (2026-11-30) |
 | Review spec trễ thì dev của sprint sau phải chờ: BrSE1 ở mức 52–60 giờ (trần 60) ở 8/9 sprint đầu, không còn chỗ cho việc phát sinh | 104 task `[BrSE]`, ví dụ #460 (SCR-030, luồng chính) | M2, M3 | Mỗi sprint chốt danh sách review của sprint sau ở buổi lập kế hoạch; BrSE2 nhận phần vượt của BrSE1; review của issue luồng chính (E06) và 完納奨励金 (E11) làm trước trong sprint | PM + BrSE1, BrSE2: chốt ở mỗi buổi lập kế hoạch, bắt đầu 2026-10-21 |
+| UAT của ba epic cuối (#552 báo cáo, #553 audit, #554 thông báo) dồn vào Sprint 12 cùng hồi quy cuối: lỗi KH phát hiện khi UAT không còn sprint để sửa trước go-live | #552, #553, #554 | M4 | Cho KH UAT sớm từng báo cáo đã xong ở Sprint 10–11 (UAT từng phần); giữ một phần năng lực Sprint 12 của BE/FE cho lỗi UAT; nếu lỗi nặng thì dời go-live, không bỏ UAT | PM + BrSE1: chốt lịch UAT từng phần với KH ở buổi xem lại Sprint 9 (2027-02-05) |
