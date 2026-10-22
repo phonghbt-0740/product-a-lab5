@@ -19,12 +19,19 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 
 **Báo cáo tiến độ.** `tools/simulate-sprint-1.py` giả lập Sprint 1 theo một kịch bản viết sẵn (việc nào xong ngày nào, việc nào kẹt vì sao) và ghi trạng thái cùng dữ liệu burndown; Agent dựng `progress-report.md` từ file đó. Rủi ro và hành động do Agent đề xuất từ dữ liệu kế hoạch.
 
+**Thêm task BrSE review spec (sau lượt review đầu).** Tôi yêu cầu đổi tên người phụ trách giả định thành BE1, FE1, QA1… và thêm cho mỗi issue một task review, điều chỉnh spec LAB-4 do BrSE làm. Agent hỏi lại bốn điểm (phạm vi, cách ước lượng, sprint, số BrSE) rồi:
+
+1. Sinh 104 sub-issue `[BrSE]` (khóa `Exx-Inn-S0`) vào backlog YAML từ chính thân issue cha (mục Phạm vi, Nguồn, trạng thái LAB-4); 15 issue đang là việc lá được tách phần hiện thực thành sub-issue riêng, giữ SWP cũ.
+2. Chấm 104 task bằng `tkm:estimate-swp` như lượt đầu (5 worker `sonnet`, nguồn là tệp tham chiếu); prompt worker thêm hướng dẫn riêng cho việc review tài liệu. Tôi duyệt 5 task mẫu và hệ số 1,3 giờ/SWP.
+3. `tools/plan-sprints.py` thêm lượt xếp thứ hai: hạn của task BrSE là sprint ngay trước sprint dev đầu tiên của issue; số BrSE tăng dần tới khi mọi task kịp hạn. Kiểm lại 316/316 việc dev giữ nguyên sprint, người (đổi tên), điểm, giờ.
+4. Giả lập lại Sprint 1 với 19 task BrSE, tạo 119 issue mới, đổi lựa chọn trường Phụ trách và ghi lại trường cho 540 mục.
+
 **Ghi SWP và các trường lên Project.** Agent (phiên Claude Code này), không phải skill, làm bước ghi:
 
 - `tools/github-backlog-sync.py fields` đọc `plans/project-values.json` (Point, Giờ ước lượng, Phụ trách, Sprint, Status cho từng mã backlog) và gọi GraphQL `updateProjectV2ItemFieldValue` theo lô 3 mục (~15 lệnh ghi/request, đặt alias).
 - Chạy thử trước (không có `--apply`): script chỉ in 5 dòng đầu để tôi duyệt, rồi mới chạy `--apply`.
 - Có file tiến độ ghi giá trị đã ghi cho từng mã; chạy lại sau khi đứt mạng thì bỏ qua mục đã ghi đúng, không ghi trùng.
-- Sau khi ghi, agent đọc lại toàn bộ Project bằng GraphQL (`fieldValueByName` cho 5 trường) và so với `project-values.json`: 421/421 mục khớp, 0 chỗ lệch.
+- Sau khi ghi, agent đọc lại toàn bộ Project bằng GraphQL (`fieldValueByName` cho 5 trường) và so với `project-values.json`: 421/421 mục khớp, 0 chỗ lệch. Sau khi thêm task BrSE, đọc lại lần nữa cả 5 trường và quan hệ cha con: 540/540 mục khớp, 0 chỗ lệch.
 
 ## 2. Review
 
@@ -41,6 +48,9 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 | 7 | Ghi hàng loạt | Xem 5 dòng đầu của lần chạy thử trước khi cho `--apply` |
 | 8 | Quyền | Cấp scope `project`, chỉ nhắm tài khoản cá nhân, nhắc gỡ sau LAB-5 |
 | 9 | Chặn mức giảm so với LAB-1 | Epic nào có công số LAB-5 giảm quá 30% so với LAB-1 thì nâng lên đúng 70% LAB-1 (4 epic: #85, #116, #182, #303; tổng 406,7 → 453,5 MD), để phòng rủi ro hiểu sai yêu cầu; 30% là mức buffer đã đưa ra từ đầu. Chỉ chặn trong `estimate.md`, giờ từng issue và kế hoạch sprint giữ nguyên |
+| 10 | Task BrSE review spec | Thêm cho 104 issue thường (bỏ 30 issue làm rõ); chấm SWP bằng skill; làm ở sprint ngay trước dev; số BrSE tính theo tải. Đổi tên người phụ trách giả định thành BE1…, FE1, QA1…, BrSE1… |
+| 11 | 5 task BrSE mẫu và hệ số giờ | Giữ nguyên cả 5 (3, 5, 16, 10, 10 SWP); chốt hệ số 1,3 giờ/SWP từ giờ ước trực tiếp của 5 mẫu |
+| 12 | Ghi lại lên GitHub | Xem bảng trước/sau (540 mục, 2228 SWP, 4088,5 giờ, Sprint 1 cam kết 261 SWP) rồi mới cho tạo 119 issue và ghi lại trường |
 
 **Vấn đề gặp ở kết quả AI/công cụ:**
 
@@ -51,11 +61,15 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 | Mã giả định PREMISE (A01..A17) trùng kiểu với mã giả định A17, A27 vốn có ở RFP, dễ đọc nhầm | Khi rà PREMISE thấy hai kiểu mã trùng nhau | Đổi PREMISE sang GĐ01..GĐ17; lệnh thay mã tự động đổi nhầm cả ví dụ trong câu quy ước nên tôi sửa tay |
 | Worker chấm SWP trả 19 dòng sai hợp đồng: 18 dòng ngành `Unknown` đi với độ tin cậy `medium`, 1 dòng sai thứ tự chữ ký độ phức tạp | Bước kiểm hợp đồng của skill trước khi nhận kết quả | Chấm lại đúng 19 dòng một lần (lô 6), kiểm lại, qua |
 | Xếp sprint tham lam cho kết quả vô lý: QA test trước khi có code | Đọc kết quả xếp thử | Thêm ràng buộc: sprint không lùi trong cùng vai trò, FE không sớm hơn BE/INFRA cùng issue, QA không sớm hơn mọi phần khác cùng issue |
-| Với một QA duy nhất, việc QA dồn cuối, 12 việc E16 tràn | Xem tải theo sprint | Thêm QA-B. Vẫn còn 2 việc hồi quy (#417, #418) vượt năng lực Sprint 12; để nguyên và ghi vào rủi ro |
+| Với một QA duy nhất, việc QA dồn cuối, 12 việc E16 tràn | Xem tải theo sprint | Thêm QA2. Vẫn còn 2 việc hồi quy (#417, #418) vượt năng lực Sprint 12; để nguyên và ghi vào rủi ro |
 | Sprint 1 đã qua nên GitHub xếp vào nhóm `completedIterations`, API không trả mã iteration ở nhóm thường | Lấy mã iteration không thấy Sprint 1 | Đọc thêm nhóm `completedIterations` khi lấy mã |
 | Các agent viết backlog chạy song song nên để phụ thuộc chéo epic dạng tạm | Ráp nối thấy 53 phụ thuộc `E01-I??` chưa có nơi trỏ | Thêm bước ráp nối riêng thay bằng khóa thật |
 | Ghi trường Project từng lệnh một quá chậm (~2.000 lệnh, ước 40 phút); gộp 30 lệnh vào một request thì GitHub trả timeout và script thử lại mãi | Theo dõi file tiến độ: 96/421 sau khoảng 15 phút; log lặp lại "lỗi mạng tạm thời" trong khi một request nhỏ vẫn chạy | Gộp lệnh bằng alias GraphQL nhưng giữ ở 3 mục (~15 lệnh) mỗi request; file tiến độ đánh dấu theo cả giá trị nên chạy lại không ghi trùng |
 | Agent viết tài liệu mô tả sai cách duyệt issue mẫu (ghi "Scope và Complexity trước") và xếp ý "LAB-5 làm đủ 53 màn" vào nhóm làm số giờ thấp hơn | Orchestrator đọc lại `estimate.md` trước khi push | Sửa: duyệt theo mức độ khó rồi điểm; chuyển ý sang nhóm làm số giờ cao hơn |
+| Script ghi YAML lỗi giữa chừng (bộ biểu diễn chuỗi nhiều dòng đăng ký sai chỗ) và đã mở file E01 để ghi đè trước khi lỗi, làm file rỗng | Lệnh báo lỗi; kiểm thấy file E01 trống | Khôi phục cả thư mục backlog từ bản sao lưu chụp ngay trước khi chạy; sửa script: dựng nội dung trước, so lại với bản đọc vào rồi mới ghi |
+| Xếp task BrSE theo "người nhẹ việc nhất" rải đều cho 4 BrSE, mỗi người chỉ 15–25 giờ/sprint sau Sprint 1 | Đọc tải theo người và sprint | Đổi sang lấp người đầu trước: BrSE1 gần đầy, BrSE2 nhận phần vượt, BrSE3/BrSE4 chỉ có việc ở Sprint 1 (cao điểm) |
+| Thay danh sách lựa chọn của trường Phụ trách thì GitHub xóa giá trị cũ của mọi mục | Biết trước từ API (lựa chọn không giữ id) | Xóa file tiến độ để ghi lại toàn bộ trường cho 540 mục, rồi đọc lại để so |
+| Tạo issue lượt hai chậm (khoảng 1 issue mỗi phút) | Theo dõi log | Để script chạy nền, làm tài liệu song song |
 | Lệch quy trình chuẩn của skill SWP (worker không dùng prompt dán trực tiếp) | Payload quá lớn nên không thể dán | Dùng 5 agent chỉ-đọc-file; ghi vào phần cảnh báo của báo cáo HTML |
 
 ## 3. Điểm đặc biệt
@@ -71,12 +85,12 @@ Làm việc trong Claude Code, một Agent điều phối và nhiều agent con.
 
 | Điểm yếu | Cải thiện |
 |---|---|
-| Tôi không đọc hết 421 issue; chỉ đọc bản duyệt dạng bảng và mẫu | Dự án thật: mỗi trưởng nhóm đọc epic của mình trước khi lên Project |
-| SWP chỉ được người duyệt trên 5 mẫu trong 316 việc lá | Tăng cỡ mẫu theo epic, cho mỗi epic ít nhất một mẫu; để đội tự chấm lại các việc có độ tin cậy thấp |
-| Hệ số giờ lấy từ 10 mẫu do AI ước và tôi duyệt, không phải đội thật; mỗi nhóm chỉ có 2 mẫu | Lấy số liệu giờ thật sau 2-3 sprint đầu để hiệu chỉnh lại |
+| Tôi không đọc hết 540 mục; chỉ đọc bản duyệt dạng bảng và mẫu | Dự án thật: mỗi trưởng nhóm đọc epic của mình trước khi lên Project |
+| SWP chỉ được người duyệt trên 10 mẫu (5 mỗi lượt chấm) trong 420 việc lá | Tăng cỡ mẫu theo epic, cho mỗi epic ít nhất một mẫu; để đội tự chấm lại các việc có độ tin cậy thấp |
+| Hệ số giờ lấy từ 10 mẫu (và 5 mẫu cho BrSE) do AI ước và tôi duyệt, không phải đội thật; mỗi nhóm chỉ có 2 mẫu | Lấy số liệu giờ thật sau 2-3 sprint đầu để hiệu chỉnh lại |
 | Sprint 1 là giả lập theo kịch bản viết sẵn, burndown không phải số đo | Đo bằng dữ liệu thật từ sprint đầu tiên |
 | Skill chạy ở chế độ worker lệch chuẩn (agent chỉ đọc file) | Nâng cấp skill chia lô nhỏ hơn để dán vừa prompt |
 | Xếp sprint bỏ qua phụ thuộc chi tiết giữa các việc, chỉ dùng ràng buộc theo vai trò và theo issue | Dùng đồ thị phụ thuộc thật để xếp, và có người xem lại kế hoạch |
 | Thời gian đồng hồ chưa được ghi lại ở bản này | Ghi giờ thật theo tuần ngay từ đầu |
 
-**Chi phí token (xấp xỉ):** viết backlog 4 agent khoảng 1,35 triệu; ráp nối khoảng 0,39 triệu; chấm SWP 6 agent (5 lô + 1 lượt sửa) khoảng 1,0 triệu; tài liệu khoảng 0,2 triệu. Tổng khoảng **2,9 triệu token**. Phần lớn nằm ở bước viết backlog và chấm SWP, nơi mỗi agent phải đọc nhiều spec.
+**Chi phí token (xấp xỉ):** viết backlog 4 agent khoảng 1,35 triệu; ráp nối khoảng 0,39 triệu; chấm SWP 6 agent (5 lô + 1 lượt sửa) khoảng 1,0 triệu; chấm 104 task BrSE 5 agent khoảng 0,68 triệu; tài liệu khoảng 0,25 triệu. Tổng khoảng **3,6 triệu token**. Phần lớn nằm ở bước viết backlog và chấm SWP, nơi mỗi agent phải đọc nhiều spec.

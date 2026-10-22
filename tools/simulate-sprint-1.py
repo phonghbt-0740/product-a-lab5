@@ -6,6 +6,8 @@ Kịch bản giả lập (ghi lại để tái lập và để báo cáo tiến 
 - Đang làm, chuyển sprint sau: E01-C01 (KH chưa trả lời chiến lược RLS) → chặn E01-I03-S1/S2;
   E01-I02-S2 (chuyển migration khó hơn dự kiến ở quyền EXECUTE của RPC); E01-I01-S2 (chờ AWS duyệt hạn mức).
 - Chưa bắt đầu: E01-I03-S3 (test phân quyền chờ RLS), E02-C01 (PM dồn sức cho E01-C01).
+- Task BrSE review spec (`…-S0`) xếp ở Sprint 1: review cho issue dev bắt đầu Sprint 1 xong ngày 1–2 (trước khi dev
+  chạm vào); review cho issue bắt đầu Sprint 2 xong rải ngày 3–10. Riêng E01-I03-S0 còn dở vì spec RLS chờ KH (E01-C01).
 Ngày xong của từng việc dùng để vẽ burndown theo ngày làm việc (1..10).
 
 Đầu ra: thêm trường Status vào plans/project-values.json (lá trong Sprint 1 theo kịch bản, lá khác Todo,
@@ -21,12 +23,31 @@ DONE_ON_DAY = {  # mã backlog → ngày làm việc hoàn thành trong sprint
 IN_PROGRESS = {"E01-C01", "E01-I03-S1", "E01-I03-S2", "E01-I02-S2", "E01-I01-S2"}
 NOT_STARTED = {"E01-I03-S3", "E02-C01"}
 WORKING_DAYS = 10
+BRSE_IN_PROGRESS = {"E01-I03-S0"}
+
+
+def brse_done_days(values):
+    """Ngày xong của các task BrSE trong Sprint 1 (xem kịch bản ở đầu file)."""
+    first = {}
+    for k, v in values.items():
+        if "Sprint" in v and not k.endswith("-S0") and "-S" in k:
+            p = k.rsplit("-S", 1)[0]
+            first[p] = min(first.get(p, 99), int(v["Sprint"].split()[1]))
+    early = sorted(k for k, v in values.items() if k.endswith("-S0") and v.get("Sprint") == "Sprint 1"
+                   and k not in BRSE_IN_PROGRESS and first.get(k[:-3]) == 1)
+    late = sorted(k for k, v in values.items() if k.endswith("-S0") and v.get("Sprint") == "Sprint 1"
+                  and k not in BRSE_IN_PROGRESS and first.get(k[:-3]) != 1)
+    days = {k: 1 + n % 2 for n, k in enumerate(early)}
+    days.update({k: 3 + (n * 8) // max(1, len(late)) for n, k in enumerate(late)})
+    return days
 
 
 def main():
     path = os.path.join(ROOT, "plans", "project-values.json")
     values = json.load(open(path))
     sprint1 = {k for k, v in values.items() if v.get("Sprint") == "Sprint 1"}
+    DONE_ON_DAY.update(brse_done_days(values))
+    IN_PROGRESS.update(BRSE_IN_PROGRESS)
     scripted = set(DONE_ON_DAY) | IN_PROGRESS | NOT_STARTED
     if sprint1 != scripted:  # kịch bản phải phủ đúng các việc đã cam kết trong Sprint 1
         raise SystemExit(f"Kịch bản lệch kế hoạch: thiếu {sorted(sprint1 - scripted)}, thừa {sorted(scripted - sprint1)}")

@@ -5,7 +5,8 @@ Lệnh con (mặc định chạy thử, thêm --apply mới ghi thật):
   setup   tạo repo public, nhãn, Project public liên kết repo, trường Point / Giờ ước lượng / Phụ trách / Loại
   issues  tạo epic → issue → sub-issue, nối sub-issue, thêm vào Project, đặt trường Loại
   plan-setup  cập nhật lựa chọn Phụ trách, tạo trường Iteration "Sprint" (10 × 2 tuần từ 2026-10-05), đọc trường Status
-  fields  ghi trường Project từ file JSON {key: {"Point": n, "Giờ ước lượng": n, "Phụ trách": "BE-A", ...}}
+  fields  ghi trường Project từ file JSON {key: {"Point": n, "Giờ ước lượng": n, "Phụ trách": "BE1", ...}}
+  clear   xóa giá trị trường của các mục đã thành issue cha (--keys K1,K2 --names "Phụ trách,Sprint")
 
 Chỉ nhắm vào OWNER/REPO cấu hình bên dưới. Trạng thái (số issue, node id, item id) lưu ở plans/github-state.json
 để chạy lại không tạo trùng.
@@ -21,7 +22,7 @@ STATE = os.path.join(ROOT, "plans", "github-state.json")
 LABEL_COLORS = {"epic": "5319e7", "screen": "0e8a16", "capability": "1d76db", "clarify": "d93f0b", "kanno": "b60205"}
 SELECT_FIELDS = {
     "Loại": ["Epic", "Issue", "Sub-issue"],
-    "Phụ trách": ["PM", "BE-A", "BE-B", "BE-C", "FE-A", "QA-A", "QA-B", "INFRA-A"],
+    "Phụ trách": ["PM", "BrSE1", "BrSE2", "BrSE3", "BrSE4", "BE1", "BE2", "BE3", "FE1", "QA1", "QA2", "INFRA1"],
 }
 NUMBER_FIELDS = ["Point", "Giờ ước lượng"]
 
@@ -217,6 +218,17 @@ def cmd_fields(apply, state, path):
     print("  xong")
 
 
+def cmd_clear(apply, state, keys, names):
+    print(f"Xóa {names} của {len(keys)} mục: {keys[:5]}…")
+    if not apply:
+        return print("  chạy thử — thêm --apply để xóa")
+    for key in keys:
+        for name in names:
+            graphql("mutation($p:ID!,$i:ID!,$f:ID!){clearProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f})"
+                    "{projectV2Item{id}}}", p=state["project_id"], i=state["issues"][key]["item"], f=state["fields"][name]["id"])
+        print(f"  {key}", flush=True)
+
+
 SPRINT_START, SPRINT_DAYS, SPRINT_COUNT = "2026-10-05", 14, 12
 
 
@@ -251,10 +263,13 @@ def cmd_plan_setup(apply, state):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=["setup", "issues", "plan-setup", "fields"])
+    ap.add_argument("command", choices=["setup", "issues", "plan-setup", "fields", "clear"])
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--values", help="file JSON cho lệnh fields")
+    ap.add_argument("--keys", default="", help="mã backlog, cách nhau dấu phẩy (lệnh clear)")
+    ap.add_argument("--names", default="", help="tên trường, cách nhau dấu phẩy (lệnh clear)")
     a = ap.parse_args()
     st = load_state()
     {"setup": lambda: cmd_setup(a.apply, st), "issues": lambda: cmd_issues(a.apply, st),
-     "plan-setup": lambda: cmd_plan_setup(a.apply, st), "fields": lambda: cmd_fields(a.apply, st, a.values)}[a.command]()
+     "plan-setup": lambda: cmd_plan_setup(a.apply, st), "fields": lambda: cmd_fields(a.apply, st, a.values),
+     "clear": lambda: cmd_clear(a.apply, st, [k for k in a.keys.split(",") if k], [n for n in a.names.split(",") if n])}[a.command]()

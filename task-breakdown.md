@@ -11,11 +11,11 @@ Mã `#<số>` là issue trên Project (khóa backlog `Exx-Inn...` ghi ở cuối
 | Cấp | Là gì | Ghi chú |
 |---|---|---|
 | Epic | Một nhóm chức năng, khớp nhóm FN của estimate LAB-1 để so sánh | 16 epic. Không chấm SWP trực tiếp |
-| Issue | Một màn hình, hoặc một năng lực xuyên màn (engine, pipeline, hạ tầng) | Là container khi có sub-issue; là việc lá khi nhỏ và chỉ một kỷ luật |
-| Sub-issue | Một phần việc giao được cho **một** người | Tối đa khoảng 2 ngày công |
+| Issue | Một màn hình, hoặc một năng lực xuyên màn (engine, pipeline, hạ tầng) | Là container: có sub-issue `[BrSE]` và các sub-issue việc làm. Chỉ issue làm rõ là việc lá |
+| Sub-issue | Một phần việc giao được cho **một** người | Tối đa khoảng 2 ngày công. Mỗi issue thường có một sub-issue `[BrSE]` review spec (mục 1.5) |
 
 - **Dừng chia** khi phần việc thỏa cả bốn: một người làm, một kỷ luật, không quá khoảng 2 ngày công, có checklist "Định nghĩa xong" đo được.
-- **Tách sub-issue** khi issue có từ hai kỷ luật trở lên (ví dụ API + giao diện) hoặc ước vượt khoảng 2 ngày. Issue nhỏ một kỷ luật không tách (ví dụ các báo cáo RPT cấu hình trên khung chung).
+- **Tách sub-issue** khi issue có từ hai kỷ luật trở lên (ví dụ API + giao diện) hoặc ước vượt khoảng 2 ngày. Issue nhỏ một kỷ luật không tách theo kỷ luật (ví dụ các báo cáo RPT cấu hình trên khung chung); từ khi thêm task BrSE, phần việc của chúng nằm ở một sub-issue "Hiện thực" duy nhất (mục 1.5).
 - Không chia máy móc: `[QA]` chỉ có khi luồng nghiệp vụ đáng kiểm riêng (E2E, kiểm thử tích hợp); unit test của logic mới nằm trong DoD của việc `[BE]`/`[FE]`.
 - Màn đã hiện thực ở LAB-3 (nhãn `lab4:da-hien-thuc`) tính là chuyển + hoàn thiện theo spec, không tính như làm mới; màn thiết kế mới (`lab4:thiet-ke`) tính đủ.
 - Chỗ spec hở hoặc mâu thuẫn mà chưa quyết được thì không đoán trong issue làm việc: tạo **issue làm rõ** (mục 1.3).
@@ -40,7 +40,7 @@ Khung thân issue: Mục tiêu · Phạm vi · Trạng thái ở LAB-4 · Nguồ
 - Trường khác trên Project: Status, Iteration, Phụ trách (người giả định theo vai trò), **Point** (SWP đã review), **Giờ ước lượng**.
 - **SWP của epic = tổng con**: chấm ở sub-issue và issue lá; issue cha cộng từ sub-issue; epic cộng từ issue. Epic không chấm riêng.
 - **Issue làm rõ** (30 cái): khóa dạng `Exx-Cnn`, nhãn `clarify`, tiêu đề `[Làm rõ]`, không có sub-issue. Mỗi cái nêu câu hỏi, các phương án, đề xuất, và issue nào bị chặn hoặc đổi estimate theo câu trả lời.
-- Nhãn: `epic` · `screen` · `capability` · `clarify` · `disc:be|fe|qa|infra|data` · `lab4:da-hien-thuc|mot-phan|thiet-ke` · `kanno` (完納奨励金) · `area:<tên ngắn epic>`.
+- Nhãn: `epic` · `screen` · `capability` · `clarify` · `disc:be|fe|qa|infra|data|brse` · `lab4:da-hien-thuc|mot-phan|thiet-ke` · `kanno` (完納奨励金) · `area:<tên ngắn epic>`.
 
 ### 1.4. Đặt khóa và tiêu đề
 
@@ -49,70 +49,80 @@ Khung thân issue: Mục tiêu · Phạm vi · Trạng thái ở LAB-4 · Nguồ
 | Epic | `Exx` | `[Epic] …` |
 | Issue | `Exx-Inn` | màn: bắt đầu bằng mã `SCR-xxx`; năng lực xuyên màn: tên năng lực |
 | Sub-issue | `Exx-Inn-Sn` | bắt đầu bằng `[BE]`, `[FE]`, `[QA]`, `[INFRA]` hoặc `[DATA]` |
+| Sub-issue BrSE | `Exx-Inn-S0` | `[BrSE] Review và điều chỉnh spec LAB-4: <tên issue cha>` |
 | Issue làm rõ | `Exx-Cnn` | `[Làm rõ] …` |
 
 Khóa nằm ở dòng cuối thân issue ("Mã backlog"). Hai cặp issue làm rõ trùng nội dung đã gộp thành một, khóa bị gộp không dùng lại nên dãy `Cnn` có chỗ trống.
 
+### 1.5. Task BrSE review và điều chỉnh spec
+
+Spec đã làm xong ở LAB-4, nhưng trước khi dev bắt đầu một issue vẫn phải có người đọc lại spec đó với PREMISE (S##, GĐ##, D##) và quyết định KH, chỉnh theo kiến trúc đích, chốt "Định nghĩa xong" với người làm. Việc này giao cho BrSE:
+
+- **Phạm vi:** mỗi issue thường (104 issue, trừ 30 issue làm rõ) có đúng một sub-issue `[BrSE]`, khóa `Exx-Inn-S0`, nhãn `disc:brse`, mang lại nhãn `lab4:*`, `area:*` và `kanno` của issue cha.
+- **Thời điểm:** ở sprint ngay trước sprint có việc dev đầu tiên của issue; issue có dev bắt đầu ngay Sprint 1 thì review ở đầu Sprint 1.
+- **Không thay issue làm rõ:** câu hỏi mới phát sinh khi review chuyển cho PM; BrSE không tự quyết thay KH.
+- **15 issue trước đây là việc lá** (một kỷ luật, không có sub-issue): khi thêm `[BrSE]` thì phần việc hiện thực được tách thành một sub-issue riêng `Exx-Inn-S1` (tiêu đề `[BE]/[FE]/[QA]/[DATA] Hiện thực: …`), giữ nguyên SWP đã chấm cho issue trước khi tách.
+
 ## 2. Spec → issue
 
 Mỗi dòng là một đơn vị spec LAB-4 (đường dẫn tương đối từ gốc bộ spec LAB-4, ghi dạng chữ, không liên kết). Cột cuối ghi phần **chưa thành issue** và lý do; "Sửa: S##" là chỗ backlog đã sửa spec theo `PREMISE.md` §1; "chờ issue làm rõ" là điểm chưa quyết, đang là issue làm rõ; "—" là phủ trọn.
-Tổng cộng 53 màn đều có issue (không màn nào bị bỏ).
+Tổng cộng 53 màn đều có issue (không màn nào bị bỏ). Số sub-issue trong cột thứ ba đã gồm sub-issue `[BrSE]` của issue đó.
 
 | Spec | Epic | Issue/sub-issue | Phần spec chưa thành issue và vì sao |
 |---|---|---|---|
-| `specs/06-screens/screen-specs/scr-001-login.md` | #50 | #56 (+3 sub-issue) | Màn phụ TOTP, đặt mật khẩu qua link, quên mật khẩu chưa có spec: chờ #83 |
-| `specs/06-screens/screen-specs/scr-002-internal-accounts.md` | #50 | #67 (+3 sub-issue) | Tạo tài khoản bên ngoài (EXT-PARTY) chưa có nguồn: để mở (G12). Sửa: S13 |
-| `specs/06-screens/screen-specs/scr-003-account-permissions.md` | #50 | #71 (+5 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-004-home.md` | #50 | #64 (+2 sub-issue) | Sửa: S14 |
-| `specs/06-screens/screen-specs/scr-005-step-up.md` | #50 | #60 (+3 sub-issue) | Sửa: S12 |
-| `specs/06-screens/screen-specs/scr-010-parties.md` | #85 | #89 (+2 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-011-party-profile.md` | #85 | #92 (+6 sub-issue) | Sửa: S17 |
-| `specs/06-screens/screen-specs/scr-012-expiry-alerts.md` | #85 | #99 (+2 sub-issue) | Job quét hết hiệu lực do #369 làm, không nằm trong issue màn |
-| `specs/06-screens/screen-specs/scr-020-lot-intake.md` | #116 | #121 (+3 sub-issue) | Sửa: S07 |
-| `specs/06-screens/screen-specs/scr-021-lots-by-day.md` | #116 | #125 (+2 sub-issue) | Đường ghi `delivered_complete` chờ #136 |
-| `specs/06-screens/screen-specs/scr-022-lot-detail.md` | #116 | #128 (+3 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-023-assessment.md` | #116 | #132 (+3 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-030-aitai-desk.md` | #137 | #149 (+7 sub-issue) | Có cần step-up/maker ≠ checker khi chốt 相対 chờ #165. Sửa: S18 |
-| `specs/06-screens/screen-specs/scr-031-trade-detail.md` | #137 | #157 (+5 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-040-seri-result-entry.md` | #166 | #167 (+3 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-041-seri-result-search.md` | #166 | #171 (+3 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-042-seri-bulk-import.md` | #166 | #175 (+5 sub-issue) | Tùy chọn trong LAB-4 nhưng vẫn làm; lô tồn đọng chờ #181. Sửa: S12 |
-| `specs/06-screens/screen-specs/scr-050-delivery-board.md` | #182 | #183 (+2 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-051-delivery-record.md` | #182 | #186 (+6 sub-issue) | Sửa: S07 |
-| `specs/06-screens/screen-specs/scr-052-delivery-exceptions.md` | #182 | #193 (+4 sub-issue) | Nhánh phụ kiểm quyền trong sơ đồ ngoại lệ chờ #201. Sửa: S07 |
-| `specs/06-screens/screen-specs/scr-053-delivery-detail.md` | #182 | #198 (+2 sub-issue) | Sửa: S16 |
-| `specs/06-screens/screen-specs/scr-060-day-reconciliation.md` | #202 | #203 (+2 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-061-day-lock.md` | #202 | #206 (+4 sub-issue) | Blocker `undelivered` giữ nhãn MOCK đến khi KH xác nhận (G28) |
-| `specs/06-screens/screen-specs/scr-062-disputes.md` | #202 | #218 (+7 sub-issue) | Mốc SLA khi lịch chợ chưa đủ ngày chờ #231. Sửa: S07, S15 |
-| `specs/06-screens/screen-specs/scr-063-payment-status.md` | #202 | #211 (+3 sub-issue) | Thời điểm tạo dòng `payments` chờ #230 |
-| `specs/06-screens/screen-specs/scr-070-correction-request.md` | #232 | #233 (+4 sub-issue) | Điều chỉnh thấp hơn số đã giao chờ #252. Sửa: S07, S19 |
-| `specs/06-screens/screen-specs/scr-071-correction-approval.md` | #232 | #238 (+4 sub-issue) | Sửa: S19 |
-| `specs/06-screens/screen-specs/scr-072-correction-approval-threshold.md` | #232 | #243 (+4 sub-issue) | Mốc chụp ngưỡng khi đổi giữa chừng chờ #251 |
-| `specs/06-screens/screen-specs/scr-080-kanno-incentive-results.md` | #253 | #270 (+4 sub-issue) | Tỷ lệ bậc là MOCK đến khi có test vector (#285); chi tiền/ghi sổ kế toán ngoài phạm vi |
-| `specs/06-screens/screen-specs/scr-081-payment-terms-due-dates.md` | #202 | #215 (+2 sub-issue) | Thời điểm snapshot điều khoản chờ #230 |
-| `specs/06-screens/screen-specs/scr-090-rule-versions.md` | #289 | #290 (+2 sub-issue) | Hiển thị một hay mọi loại quy tắc chờ #301 |
-| `specs/06-screens/screen-specs/scr-091-rule-version-edit.md` | #289 | #293 (+3 sub-issue) | Trần 4 lần đổi quy tắc/năm chờ #302 |
-| `specs/06-screens/screen-specs/scr-100-report-hub.md` | #303 | #309 (việc lá) | Sửa: S06, S20 |
-| `specs/06-screens/screen-specs/scr-101-rpt-01-daily-trades.md` | #303 | #310 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-102-rpt-02-lot-trade-history.md` | #303 | #311 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-103-rpt-03-party-validity.md` | #303 | #312 (việc lá) | Cột còn là đề xuất (thiếu `valid_from`): #335 |
-| `specs/06-screens/screen-specs/scr-104-rpt-04-delivery-backlog.md` | #303 | #313 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-105-rpt-05-day-reconciliation.md` | #303 | #314 (việc lá) | Cột còn là đề xuất (thiếu ngoại lệ mở theo bên mua): #335 |
-| `specs/06-screens/screen-specs/scr-106-rpt-06-accounting-export.md` | #303 | #315 (+2 sub-issue) | Đặc tả IF-ACC-01 (cột tệp, ACK, SFTP hay REST) chờ #334. Sửa: S21 |
-| `specs/06-screens/screen-specs/scr-107-rpt-07-kanno-results.md` | #253 | #275 (+2 sub-issue) | Cột chưa tách delta theo kỳ gốc: #335. Sửa: S02 |
-| `specs/06-screens/screen-specs/scr-108-rpt-08-post-lock-log.md` | #303 | #318 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-109-rpt-09-dispute-sla.md` | #303 | #319 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-110-rpt-10-monthly-by-party.md` | #303 | #320 (+2 sub-issue) | Cột thưởng chỉ hiện khi có quyền (kanno), xem mục 3 |
-| `specs/06-screens/screen-specs/scr-111-rpt-11-monthly-by-trade-kind.md` | #303 | #323 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-112-rpt-12-rule-changes.md` | #303 | #324 (việc lá) | — |
-| `specs/06-screens/screen-specs/scr-120-audit-search.md` | #336 | #347 (+2 sub-issue) | Sửa: S23 |
-| `specs/06-screens/screen-specs/scr-121-audit-detail.md` | #336 | #350 (+2 sub-issue) | Tra theo `id` trên bảng phân vùng chờ #357 |
-| `specs/06-screens/screen-specs/scr-130-notification-inbox.md` | #360 | #374 (+2 sub-issue) | Email người nhận ngoài chờ #385 |
-| `specs/06-screens/screen-specs/scr-131-notification-settings.md` | #360 | #377 (+2 sub-issue) | Mức độ `delivery_backlog` chờ #386. Sửa: S22 |
-| `specs/06-screens/screen-specs/scr-132-notification-log.md` | #360 | #380 (+2 sub-issue) | Sửa: S03 |
-| `specs/06-screens/screen-specs/scr-140-market-calendar.md` | #103 | #104 (+3 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-141-items.md` | #103 | #108 (+2 sub-issue) | — |
-| `specs/06-screens/screen-specs/scr-142-payment-terms.md` | #103 | #111 (+2 sub-issue) | Ai được ghi điều khoản chờ #115 |
+| `specs/06-screens/screen-specs/scr-001-login.md` | #50 | #56 (+4 sub-issue) | Màn phụ TOTP, đặt mật khẩu qua link, quên mật khẩu chưa có spec: chờ #83 |
+| `specs/06-screens/screen-specs/scr-002-internal-accounts.md` | #50 | #67 (+4 sub-issue) | Tạo tài khoản bên ngoài (EXT-PARTY) chưa có nguồn: để mở (G12). Sửa: S13 |
+| `specs/06-screens/screen-specs/scr-003-account-permissions.md` | #50 | #71 (+6 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-004-home.md` | #50 | #64 (+3 sub-issue) | Sửa: S14 |
+| `specs/06-screens/screen-specs/scr-005-step-up.md` | #50 | #60 (+4 sub-issue) | Sửa: S12 |
+| `specs/06-screens/screen-specs/scr-010-parties.md` | #85 | #89 (+3 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-011-party-profile.md` | #85 | #92 (+7 sub-issue) | Sửa: S17 |
+| `specs/06-screens/screen-specs/scr-012-expiry-alerts.md` | #85 | #99 (+3 sub-issue) | Job quét hết hiệu lực do #369 làm, không nằm trong issue màn |
+| `specs/06-screens/screen-specs/scr-020-lot-intake.md` | #116 | #121 (+4 sub-issue) | Sửa: S07 |
+| `specs/06-screens/screen-specs/scr-021-lots-by-day.md` | #116 | #125 (+3 sub-issue) | Đường ghi `delivered_complete` chờ #136 |
+| `specs/06-screens/screen-specs/scr-022-lot-detail.md` | #116 | #128 (+4 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-023-assessment.md` | #116 | #132 (+4 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-030-aitai-desk.md` | #137 | #149 (+8 sub-issue) | Có cần step-up/maker ≠ checker khi chốt 相対 chờ #165. Sửa: S18 |
+| `specs/06-screens/screen-specs/scr-031-trade-detail.md` | #137 | #157 (+6 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-040-seri-result-entry.md` | #166 | #167 (+4 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-041-seri-result-search.md` | #166 | #171 (+4 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-042-seri-bulk-import.md` | #166 | #175 (+6 sub-issue) | Tùy chọn trong LAB-4 nhưng vẫn làm; lô tồn đọng chờ #181. Sửa: S12 |
+| `specs/06-screens/screen-specs/scr-050-delivery-board.md` | #182 | #183 (+3 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-051-delivery-record.md` | #182 | #186 (+7 sub-issue) | Sửa: S07 |
+| `specs/06-screens/screen-specs/scr-052-delivery-exceptions.md` | #182 | #193 (+5 sub-issue) | Nhánh phụ kiểm quyền trong sơ đồ ngoại lệ chờ #201. Sửa: S07 |
+| `specs/06-screens/screen-specs/scr-053-delivery-detail.md` | #182 | #198 (+3 sub-issue) | Sửa: S16 |
+| `specs/06-screens/screen-specs/scr-060-day-reconciliation.md` | #202 | #203 (+3 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-061-day-lock.md` | #202 | #206 (+5 sub-issue) | Blocker `undelivered` giữ nhãn MOCK đến khi KH xác nhận (G28) |
+| `specs/06-screens/screen-specs/scr-062-disputes.md` | #202 | #218 (+8 sub-issue) | Mốc SLA khi lịch chợ chưa đủ ngày chờ #231. Sửa: S07, S15 |
+| `specs/06-screens/screen-specs/scr-063-payment-status.md` | #202 | #211 (+4 sub-issue) | Thời điểm tạo dòng `payments` chờ #230 |
+| `specs/06-screens/screen-specs/scr-070-correction-request.md` | #232 | #233 (+5 sub-issue) | Điều chỉnh thấp hơn số đã giao chờ #252. Sửa: S07, S19 |
+| `specs/06-screens/screen-specs/scr-071-correction-approval.md` | #232 | #238 (+5 sub-issue) | Sửa: S19 |
+| `specs/06-screens/screen-specs/scr-072-correction-approval-threshold.md` | #232 | #243 (+5 sub-issue) | Mốc chụp ngưỡng khi đổi giữa chừng chờ #251 |
+| `specs/06-screens/screen-specs/scr-080-kanno-incentive-results.md` | #253 | #270 (+5 sub-issue) | Tỷ lệ bậc là MOCK đến khi có test vector (#285); chi tiền/ghi sổ kế toán ngoài phạm vi |
+| `specs/06-screens/screen-specs/scr-081-payment-terms-due-dates.md` | #202 | #215 (+3 sub-issue) | Thời điểm snapshot điều khoản chờ #230 |
+| `specs/06-screens/screen-specs/scr-090-rule-versions.md` | #289 | #290 (+3 sub-issue) | Hiển thị một hay mọi loại quy tắc chờ #301 |
+| `specs/06-screens/screen-specs/scr-091-rule-version-edit.md` | #289 | #293 (+4 sub-issue) | Trần 4 lần đổi quy tắc/năm chờ #302 |
+| `specs/06-screens/screen-specs/scr-100-report-hub.md` | #303 | #309 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | Sửa: S06, S20 |
+| `specs/06-screens/screen-specs/scr-101-rpt-01-daily-trades.md` | #303 | #310 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-102-rpt-02-lot-trade-history.md` | #303 | #311 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-103-rpt-03-party-validity.md` | #303 | #312 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | Cột còn là đề xuất (thiếu `valid_from`): #335 |
+| `specs/06-screens/screen-specs/scr-104-rpt-04-delivery-backlog.md` | #303 | #313 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-105-rpt-05-day-reconciliation.md` | #303 | #314 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | Cột còn là đề xuất (thiếu ngoại lệ mở theo bên mua): #335 |
+| `specs/06-screens/screen-specs/scr-106-rpt-06-accounting-export.md` | #303 | #315 (+3 sub-issue) | Đặc tả IF-ACC-01 (cột tệp, ACK, SFTP hay REST) chờ #334. Sửa: S21 |
+| `specs/06-screens/screen-specs/scr-107-rpt-07-kanno-results.md` | #253 | #275 (+3 sub-issue) | Cột chưa tách delta theo kỳ gốc: #335. Sửa: S02 |
+| `specs/06-screens/screen-specs/scr-108-rpt-08-post-lock-log.md` | #303 | #318 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-109-rpt-09-dispute-sla.md` | #303 | #319 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-110-rpt-10-monthly-by-party.md` | #303 | #320 (+3 sub-issue) | Cột thưởng chỉ hiện khi có quyền (kanno), xem mục 3 |
+| `specs/06-screens/screen-specs/scr-111-rpt-11-monthly-by-trade-kind.md` | #303 | #323 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-112-rpt-12-rule-changes.md` | #303 | #324 (+2 sub-issue: [BrSE] và việc hiện thực tách ra) | — |
+| `specs/06-screens/screen-specs/scr-120-audit-search.md` | #336 | #347 (+3 sub-issue) | Sửa: S23 |
+| `specs/06-screens/screen-specs/scr-121-audit-detail.md` | #336 | #350 (+3 sub-issue) | Tra theo `id` trên bảng phân vùng chờ #357 |
+| `specs/06-screens/screen-specs/scr-130-notification-inbox.md` | #360 | #374 (+3 sub-issue) | Email người nhận ngoài chờ #385 |
+| `specs/06-screens/screen-specs/scr-131-notification-settings.md` | #360 | #377 (+3 sub-issue) | Mức độ `delivery_backlog` chờ #386. Sửa: S22 |
+| `specs/06-screens/screen-specs/scr-132-notification-log.md` | #360 | #380 (+3 sub-issue) | Sửa: S03 |
+| `specs/06-screens/screen-specs/scr-140-market-calendar.md` | #103 | #104 (+4 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-141-items.md` | #103 | #108 (+3 sub-issue) | — |
+| `specs/06-screens/screen-specs/scr-142-payment-terms.md` | #103 | #111 (+3 sub-issue) | Ai được ghi điều khoản chờ #115 |
 | `specs/04-adr/ADR-0001-vercel-supabase-thay-fargate-rds.md` | #1 | #5 | Quyết định cho prototype (Vercel + Supabase), không có việc dựng lại; bản thật theo ADR-0013 |
 | `specs/04-adr/ADR-0002-supabase-auth-rls-chi-doc-ghi-qua-api-withroute.md` | #1 | #9, #51 | Phần RLS sau khi bỏ Supabase Auth chờ #48 |
 | `specs/04-adr/ADR-0003-rpc-nguyen-tu-va-thu-tu-khoa.md` | #137 | #145, #206, #248 | — |
@@ -153,7 +163,7 @@ Tổng cộng 53 màn đều có issue (không màn nào bị bỏ).
 ## 3. Hạng mục chịu ràng buộc đặc thù (完納奨励金)
 
 完納奨励金 (thưởng thanh toán đúng hạn) có công thức, vòng đời kết quả và người chịu trách nhiệm riêng, nên toàn bộ nằm ở #253 và mọi mục liên quan mang nhãn `kanno`.
-Ngoài #253 chỉ có hai mảnh có điều kiện và một mục hồi quy (dòng cuối bảng), đều gắn `kanno` và phụ thuộc #253. Có thể lọc nhãn này để so với estimate LAB-1 nhóm FN-09.
+Ngoài #253 chỉ có hai mảnh có điều kiện và một mục hồi quy (dòng cuối bảng), đều gắn `kanno` và phụ thuộc #253. Task `[BrSE]` review spec của các issue này cũng mang nhãn `kanno`. Có thể lọc nhãn này để so với estimate LAB-1 nhóm FN-09.
 
 | Ràng buộc | Issue | Vì sao tách riêng |
 |---|---|---|

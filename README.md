@@ -15,10 +15,12 @@ Backlog được chia từ bản nộp LAB-4 ngày 2026-10-09 (commit `f576f42`)
 | `PREMISE.md` | **Có thay đổi** so với LAB-4: 25 dòng sửa/thêm spec (S01–S25), 17 giả định bổ sung (GĐ01–GĐ17), 14 hướng đã chốt (D01–D14) |
 | Epic | 16 |
 | Issue | 134, trong đó 30 issue làm rõ (nhãn `clarify`) |
-| Sub-issue | 271 |
-| Tổng mục trên Project | 421 (16 epic + 134 issue + 271 sub-issue) |
+| Sub-issue | 390: 271 việc dev/QA, 104 task `[BrSE]` review spec LAB-4, 15 việc hiện thực tách ra khi thêm `[BrSE]` |
+| Tổng mục trên Project | 540 (16 epic + 134 issue + 390 sub-issue) |
+| Người phụ trách giả định | PM, BrSE1–BrSE4, BE1–BE3, FE1, QA1–QA2, INFRA1 |
+| Estimate | 2228 SWP, 4088,5 giờ chưa buffer (chi tiết ở [`estimate.md`](estimate.md)) |
 | Ràng buộc đặc thù | 完納奨励金: epic #253 và các mục gắn nhãn `kanno` (xem `task-breakdown.md` §3) |
-| Sprint giả lập | Sprint 1 (Iteration "Sprint 1", 2026-10-05 → 2026-10-16) đã giả lập: cam kết 116 SWP, xong 76 SWP (66%); chi tiết ở [`progress-report.md`](progress-report.md) |
+| Sprint giả lập | Sprint 1 (Iteration "Sprint 1", 2026-10-05 → 2026-10-16) đã giả lập: cam kết 261 SWP, xong 211 SWP (81%; riêng việc dev 76/116 = 66%); chi tiết ở [`progress-report.md`](progress-report.md) |
 
 ## Link
 
@@ -26,8 +28,8 @@ Backlog được chia từ bản nộp LAB-4 ngày 2026-10-09 (commit `f576f42`)
 - GitHub Project: https://github.com/users/phonghbt-0740/projects/1
   - View **Backlog** (bảng, nhóm theo sprint, có Point / Giờ ước lượng / Loại / Phụ trách): https://github.com/users/phonghbt-0740/projects/1/views/1
   - View **Board** (việc lá theo Status): https://github.com/users/phonghbt-0740/projects/1/views/2
-  - View **Sprint 1** (19 việc của sprint đã giả lập: Done 12 · In Progress 5 · Todo 2): https://github.com/users/phonghbt-0740/projects/1/views/3
-- Báo cáo SWP (HTML): [`reports/swp-estimate-report.html`](reports/swp-estimate-report.html)
+  - View **Sprint 1** (38 việc của sprint đã giả lập: Done 30 · In Progress 6 · Todo 2): https://github.com/users/phonghbt-0740/projects/1/views/3
+- Báo cáo SWP (HTML): [`reports/swp-estimate-report.html`](reports/swp-estimate-report.html) (việc dev/QA/PM) · [`reports/swp-estimate-report-brse.html`](reports/swp-estimate-report-brse.html) (task BrSE review spec)
 - Đã mở thử bằng cửa sổ ẩn danh: có — ngày 2026-10-20, mở repo, Project, một issue và báo cáo HTML bằng trình duyệt chưa đăng nhập GitHub (cửa sổ ẩn danh): xem được đầy đủ, không bị yêu cầu đăng nhập
 
 ## Cấu trúc repo
@@ -40,8 +42,8 @@ Backlog được chia từ bản nộp LAB-4 ngày 2026-10-09 (commit `f576f42`)
 | `estimate.md` | Cách chấm SWP, quy giờ, kết quả theo epic, so với estimate LAB-1 |
 | `progress-report.md` | Báo cáo tiến độ sprint giả lập: burndown, rủi ro trễ và hành động |
 | `AI-report.md` | Cách dùng AI trong LAB-5: công cụ, chỗ AI sai và cách sửa, giờ làm |
-| `reports/` | Báo cáo HTML của skill SWP (một file HTML) |
-| `tools/` | Script tự viết: `github-backlog-sync.py` (tạo nhãn, issue, quan hệ sub-issue, Project, trường Sprint và ghi trường Point/Giờ ước lượng/Phụ trách/Sprint/Status) · `plan-sprints.py` (quy SWP ra giờ, gán người phụ trách giả định, xếp sprint) · `simulate-sprint-1.py` (kịch bản Sprint 1 giả lập + burndown) · `render-docs.py` (đổi mã backlog thành số issue khi xuất tài liệu) |
+| `reports/` | Báo cáo HTML của skill SWP: lượt chấm việc dev/QA/PM và lượt chấm task BrSE |
+| `tools/` | Script tự viết: `github-backlog-sync.py` (tạo nhãn, issue, quan hệ sub-issue, Project, trường Sprint và ghi trường Point/Giờ ước lượng/Phụ trách/Sprint/Status) · `plan-sprints.py` (quy SWP ra giờ, gán người phụ trách giả định, xếp sprint, xếp task BrSE trước sprint dev) · `simulate-sprint-1.py` (kịch bản Sprint 1 giả lập + burndown) · `render-docs.py` (đổi mã backlog thành số issue khi xuất tài liệu) |
 | `.gitignore` | Loại các file chỉ dùng cục bộ khỏi repo công khai |
 
 ## Spec → epic
